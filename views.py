@@ -15,10 +15,14 @@ from . models import XForm, get_or_create_instance
 @require_GET
 def formList(request):
     """This is where ODK Collect gets its download list."""
-    forms = [f.id_string for f in XForm.objects.filter(downloadable=True)]
-    return render_to_response("formList.xml",
-                              {"forms": forms},
-                              mimetype="application/xml")
+    info = {
+            "forms" : XForm.objects.filter(downloadable=True),
+            }
+    return render_to_response(
+        "formList.xml",
+        info,
+        mimetype="application/xml"
+        )
 
 @require_POST
 @csrf_exempt
@@ -47,6 +51,15 @@ def submission(request):
         return HttpResponseBadRequest(
             "We need to improve our error messages and logging."
             )
+
+def download_xform(request, id_string):
+    info = {"xform" : XForm.objects.get(id_string=id_string)}
+    return render_to_response(
+        "xform.xml",
+        info,
+        mimetype="application/xml"
+        )
+
 
 # This following code bothers me a little bit, it seems perfectly
 # suited to be put in the Django admin.

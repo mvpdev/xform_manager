@@ -1,7 +1,5 @@
 <forms>
-{% if forms %}
-  {% for name, url in forms %}
-  <form url="{{ url }}">{{ name }}</form>
+  {% for f in forms %}
+  <form url="{{ f.url }}">{{ f.file_name }}</form>
   {% endfor %}
-{% endif %}
 </forms>

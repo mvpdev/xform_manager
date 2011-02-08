@@ -7,6 +7,8 @@ from . import views
 
 urlpatterns = patterns('',
     url(r"^formList$", views.formList),
+    url(r"^download-xform/(?P<id_string>[^/]+)\.xml$",
+        views.download_xform, name="download-xform"),
     url(r"^submission$", views.submission),
 
     url(r"^create-xform/$", views.create_xform),
