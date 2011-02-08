@@ -18,5 +18,5 @@ def get_or_create_instance(xml_file, media_files):
     instance, created = Instance.objects.get_or_create(xml=xml)
     if created:
         for f in media_files:
-            Attachment.objects.create(instance=instance, attachment=f)
+            Attachment.objects.create(instance=instance, media_file=f)
     return instance, created
