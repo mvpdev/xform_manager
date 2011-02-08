@@ -2,8 +2,10 @@
 Testing POSTs to "/submission"
 """
 from django.test import TestCase, Client
-from .models import XForm
+from django.core.urlresolvers import reverse
 import os
+from .models import XForm
+from . import urls
 
 class TextXFormCreation(TestCase):
     def test_xform_creation(self):
@@ -22,12 +24,11 @@ class TextXFormCreation(TestCase):
         self.assertEqual(xform.id_string, "Registration2010-12-04_09-34-00")
         self.assertEqual(xform.title, "Registration")
         self.assertEqual(xform.file_name(), "Registration2010-12-04_09-34-00.xml")
-        print xform.url()
         self.assertTrue(xform.url().endswith("Registration2010-12-04_09-34-00.xml"))
 
 class TestFormSubmission(TestCase):
     def tests_formlist(self):
-        response = self.client.get("/formList")
+        response = self.client.get(reverse(urls.FORM_LIST))
         self.assertEqual(response.status_code, 200)
     
     def test_empty_post(self):
