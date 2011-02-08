@@ -2,6 +2,28 @@
 Testing POSTs to "/submission"
 """
 from django.test import TestCase, Client
+from .models import XForm
+import os
+
+class TextXFormCreation(TestCase):
+    def test_xform_creation(self):
+        f = open(os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "fixtures", "test_forms", "registration", "forms",
+                "test_registration.xml"
+                ))
+        xml = f.read()
+        f.close()
+        xform = XForm.objects.create(
+            web_title="blah",
+            xml=xml
+            )
+        self.assertEqual(xform.xml, xml)
+        self.assertEqual(xform.id_string, "Registration2010-12-04_09-34-00")
+        self.assertEqual(xform.title, "Registration")
+        self.assertEqual(xform.file_name(), "Registration2010-12-04_09-34-00.xml")
+        print xform.url()
+        self.assertTrue(xform.url().endswith("Registration2010-12-04_09-34-00.xml"))
 
 class TestFormSubmission(TestCase):
     def tests_formlist(self):
@@ -27,6 +49,6 @@ class TestFormSubmission(TestCase):
             )
         }
         response = self.client.post("/submission", post_data)
-#        self.assertEqual(response.status_code, 200)
+        # self.assertEqual(response.status_code, 200)
 
 

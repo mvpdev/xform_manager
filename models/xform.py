@@ -5,6 +5,7 @@ import datetime
 from django.db import models
 from .. import utils, tag
 from django.core.urlresolvers import reverse
+import re
 
 # these cleaners will be used when saving data
 # All cleaned types should be in this list
@@ -26,8 +27,8 @@ class XForm(models.Model):
     downloadable = models.BooleanField()
     description = models.TextField(blank=True, null=True, default="")
     xml = models.TextField()
-    id_string = models.CharField(
-        unique=True, editable=False, verbose_name="ID String", max_length=64
+    id_string = models.SlugField(
+        unique=True, editable=False, verbose_name="ID String"
         )
     title = models.CharField(editable=False, max_length=64)
 
@@ -54,6 +55,7 @@ class XForm(models.Model):
     def save(self, *args, **kwargs):
         self.guarantee_parser()
         self.id_string = self.parser.get_id_string()
+        assert re.search(r"^[\w\-]+$", self.id_string), "Make sure this is a slug."
         self.title = self.parser.get_title()
         super(XForm, self).save(*args, **kwargs)
 
