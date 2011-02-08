@@ -53,10 +53,9 @@ def submission(request):
             )
 
 def download_xform(request, id_string):
-    info = {"xform" : XForm.objects.get(id_string=id_string)}
-    return render_to_response(
-        "xform.xml",
-        info,
+    xform = XForm.objects.get(id_string=id_string)
+    return HttpResponse(
+        xform.xml,
         mimetype="application/xml"
         )
 
