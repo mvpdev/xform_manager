@@ -6,4 +6,4 @@ class Attachment(models.Model):
     media_file = models.FileField(upload_to="attachments")
 
     class Meta:
-        app_label = 'odk_logger'
+        app_label = 'xform_manager'

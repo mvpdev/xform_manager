@@ -4,4 +4,4 @@ class SurveyType(models.Model):
     slug = models.CharField(max_length=100)
 
     class Meta:
-        app_label = 'odk_logger'
+        app_label = 'xform_manager'

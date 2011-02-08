@@ -14,7 +14,7 @@ class Instance(models.Model):
     survey_type = models.ForeignKey(SurveyType)
 
     class Meta:
-        app_label = 'odk_logger'
+        app_label = 'xform_manager'
 
     def _set_xform(self, doc):
         try:

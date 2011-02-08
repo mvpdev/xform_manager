@@ -31,7 +31,7 @@ class XForm(models.Model):
     title = models.CharField(editable=False, max_length=64)
 
     class Meta:
-        app_label = 'odk_logger'
+        app_label = 'xform_manager'
         verbose_name = "XForm"
         verbose_name_plural = "XForms"
         ordering = ("id_string",)
