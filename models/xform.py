@@ -4,6 +4,7 @@
 import datetime
 from django.db import models
 from .. import utils, tag
+from django.core.urlresolvers import reverse
 
 # these cleaners will be used when saving data
 # All cleaned types should be in this list
@@ -35,6 +36,15 @@ class XForm(models.Model):
         verbose_name = "XForm"
         verbose_name_plural = "XForms"
         ordering = ("id_string",)
+
+    def file_name(self):
+        return self.id_string + ".xml"
+
+    def url(self):
+        return reverse(
+            "download-xform",
+            kwargs={"id_string" : self.id_string},
+            )
 
     def guarantee_parser(self):
         # there must be a better way than this solution
