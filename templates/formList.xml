@@ -1,5 +1,5 @@
 <forms>
-  {% for f in forms %}
+  {% for f in xforms %}
   <form url="{{ f.url }}">{{ f.file_name }}</form>
   {% endfor %}
 </forms>

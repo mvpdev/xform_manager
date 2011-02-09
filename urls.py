@@ -12,12 +12,12 @@ LIST_XFORMS = "list-xforms"
 FORM_LIST = "form-list"
 
 urlpatterns = patterns('',
-    url(r"^formList$", views.formList, name=FORM_LIST),
+    url(r"^((?P<group_name>[^/]+)/)?formList$", views.formList, name=FORM_LIST),
     url(r"^download-xform/(?P<id_string>[^/]+)\.xml$",
         views.download_xform, name=DOWNLOAD_XFORM),
     url(r"^submission$", views.submission),
 
     url(r"^create-xform/$", views.create_xform),
-    url(r"^list-xforms/$", views.list_xforms, name=LIST_XFORMS),
+    url(r"^((?P<group_name>[^/]+)/)?list-xforms/$", views.list_xforms, name=LIST_XFORMS),
     url(r"^update-xform/(?P<pk>\d+)/$", views.update_xform),
 )
