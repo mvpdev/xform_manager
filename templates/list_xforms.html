@@ -20,16 +20,16 @@ List XForms
 	<tbody>
 {% for xform in xforms %}
 		<tr>
-			<td>
+			<td class='centered'>
 				<a href="../update-xform/{{xform.id}}/" class="edit">[ edit ]</a>
 			</td>
-			<td>
+			<td class='centered'>
 				{{ xform.title }}
 			</td>
-			<td>
+			<td class='centered'>
 				{{ xform.submission_count }}
 			</td>
-			<td>
+			<td class='centered'>
 				{{ xform.date_of_last_submission }}
 			</td>
 		</tr>
