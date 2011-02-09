@@ -1,14 +1,39 @@
-<table>
-  <tr>
-    <td>Title</td>
-    <td>Number of Submissions</td>
-    <td>Date of Last Submission</td>
-  </tr>
+{% extends "base.html" %}
+{% block title %}
+List XForms
+{% endblock %}
+{% block content %}
+<table class="pretty fullw">
+	<thead>
+		<tr>
+			<th>
+				Title
+			</th>
+			<th>
+				Number of Submissions
+			</th>
+			<th>
+				Date of Last Submission
+			</th>
+		</tr>
+	</thead>
+	<tbody>
 {% for xform in xforms %}
-<tr>
-  <td>{{ xform.title }}</td>
-  <td>{{ xform.submission_count }}</td>
-  <td>{{ xform.date_of_last_submission }}</td>
-</tr>
+		<tr>
+			<td>
+				<a href="../update-xform/{{xform.id}}/" class="edit">[ edit ]</a>
+			</td>
+			<td>
+				{{ xform.title }}
+			</td>
+			<td>
+				{{ xform.submission_count }}
+			</td>
+			<td>
+				{{ xform.date_of_last_submission }}
+			</td>
+		</tr>
 {% endfor %}
+	</tbody>
 </table>
+{% endblock %}
