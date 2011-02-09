@@ -61,7 +61,7 @@ class XForm(models.Model):
     def save(self, *args, **kwargs):
         self.guarantee_parser()
         self.id_string = self.parser.get_id_string()
-        assert re.search(r"^[\w\-]+$", self.id_string), "Make sure this is a slug."
+        assert re.search(r"^[\w-]+$", self.id_string), "Make sure this is a slug."
         self.title = self.parser.get_title()
         super(XForm, self).save(*args, **kwargs)
 
