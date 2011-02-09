@@ -5,6 +5,8 @@ import datetime
 from django.db import models
 from .. import utils, tag
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import Group
 import re
 
 # these cleaners will be used when saving data
@@ -26,6 +28,10 @@ class XForm(models.Model):
     web_title = models.CharField(max_length=64)
     downloadable = models.BooleanField()
     description = models.TextField(blank=True, null=True, default="")
+    groups = models.ManyToManyField(
+        Group, verbose_name=_('groups'), blank=True,
+        help_text=_("Each XForm is assigned to groups, only users in atleast one of this XForm's groups will be able to update this XForm.")
+        )
     xml = models.TextField()
     id_string = models.SlugField(
         unique=True, editable=False, verbose_name="ID String"
