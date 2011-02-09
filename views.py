@@ -8,6 +8,8 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.forms import ModelForm
 from django.views.generic.create_update import create_object, update_object
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import Group
+from django.forms.models import ModelMultipleChoiceField
 
 import itertools
 from . models import XForm, get_or_create_instance
@@ -66,6 +68,12 @@ def download_xform(request, id_string):
 # CRUD for xforms
 # (C)reate using a ModelForm
 class CreateXForm(ModelForm):
+    # Notice this form only chooses from Groups that have a name that
+    # is a slug. We may end up changing this more depending on the
+    # user accessing this form.
+    groups = ModelMultipleChoiceField(
+        Group.objects.filter(name__regex=r"[\w\-]+")
+        )
     class Meta:
         model = XForm
         exclude = ("id_string", "title",)
@@ -87,6 +95,9 @@ def list_xforms(request):
 
 # (U)pdate using another ModelForm
 class UpdateXForm(ModelForm):
+    groups = ModelMultipleChoiceField(
+        Group.objects.filter(name__regex=r"[\w\-]+")
+        )
     class Meta:
         model = XForm
         fields = ("web_title", "downloadable", "description",)
