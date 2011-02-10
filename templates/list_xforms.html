@@ -7,6 +7,12 @@ List XForms
 	<thead>
 		<tr>
 			<th>
+				
+			</th>
+			<th>
+				Public?
+			</th>
+			<th>
 				Title
 			</th>
 			<th>
@@ -23,6 +29,15 @@ List XForms
 			<td class='centered'>
 				<a href="../update-xform/{{xform.id}}/" class="edit">[ edit ]</a>
 			</td>
+			{% if xform.downloadable %}
+			<td class='centered'>
+				<span class="downloadable true">Downloadable</span>
+			</td>
+			{% else %}
+			<td class='centered'>
+				<span class="downloadable false">Not Downloadable</span>
+			</td>
+			{% endif %}
 			<td class='centered'>
 				{{ xform.title }}
 			</td>
@@ -36,4 +51,16 @@ List XForms
 {% endfor %}
 	</tbody>
 </table>
+<script type="text/javascript" charset="utf-8">
+<!--
+	$('tr span.downloadable.true').each(function(){$(this).parents('tr').find('td').css({'font-weight':'bold'})})
+-->
+</script>
+<br />
+<a href="../create-xform/" class="button">Add New XForm</a>
+<script type="text/javascript" charset="utf-8">
+<!--
+	$('a.button').button();
+-->
+</script>
 {% endblock %}
