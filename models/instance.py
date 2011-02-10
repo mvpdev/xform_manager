@@ -43,3 +43,9 @@ class Instance(models.Model):
         self._set_date(doc)
         self._set_survey_type(doc)
         super(Instance, self).save(*args, **kwargs)
+
+    def get_dict(self):
+        """Return a python object representation of this instance's XML."""
+        doc = utils.parse_xform_instance(self.xml)
+        self.xform.clean_instance(doc)
+        return doc

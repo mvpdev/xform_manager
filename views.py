@@ -15,14 +15,13 @@ import itertools
 from . models import XForm, get_or_create_instance
 
 @require_GET
-def formList(request):
+def formList(request, group_name):
     """This is where ODK Collect gets its download list."""
-    info = {
-            "forms" : XForm.objects.filter(downloadable=True),
-            }
+    xforms = XForm.objects.filter(downloadable=True) if not group_name \
+        else XForm.objects.filter(downloadable=True, groups__name=group_name)
     return render_to_response(
         "formList.xml",
-        info,
+        {"xforms" : xforms},
         mimetype="application/xml"
         )
 
@@ -68,12 +67,6 @@ def download_xform(request, id_string):
 # CRUD for xforms
 # (C)reate using a ModelForm
 class CreateXForm(ModelForm):
-    # Notice this form only chooses from Groups that have a name that
-    # is a slug. We may end up changing this more depending on the
-    # user accessing this form.
-    groups = ModelMultipleChoiceField(
-        Group.objects.filter(name__regex=r"[\w\-]+")
-        )
     class Meta:
         model = XForm
         exclude = ("id_string", "title",)
@@ -87,20 +80,19 @@ def create_xform(request):
         )
 
 # (R)ead using a nice list
-def list_xforms(request):
+def list_xforms(request, group_name):
+    xforms = XForm.objects.filter(downloadable=True) if not group_name \
+        else XForm.objects.filter(downloadable=True, groups__name=group_name)
     return render_to_response(
         "list_xforms.html",
-        {"xforms" : XForm.objects.all()}
+        {"xforms" : xforms}
         )
 
 # (U)pdate using another ModelForm
 class UpdateXForm(ModelForm):
-    groups = ModelMultipleChoiceField(
-        Group.objects.filter(name__regex=r"[\w\-]+")
-        )
     class Meta:
         model = XForm
-        fields = ("web_title", "downloadable", "description",)
+        fields = ("web_title", "downloadable", "description", "groups",)
 
 def update_xform(request, pk):
     return update_object(
