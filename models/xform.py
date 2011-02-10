@@ -7,6 +7,7 @@ from .. import utils, tag
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
+from django.conf import settings
 import re
 
 # these cleaners will be used when saving data
@@ -61,7 +62,8 @@ class XForm(models.Model):
     def save(self, *args, **kwargs):
         self.guarantee_parser()
         self.id_string = self.parser.get_id_string()
-        assert re.search(r"^[\w-]+$", self.id_string), "Make sure this is a slug."
+        if settings.STRICT:
+            assert re.search(r"^[\w-]+$", self.id_string), "Make sure this is a slug."
         self.title = self.parser.get_title()
         super(XForm, self).save(*args, **kwargs)
 
@@ -87,8 +89,6 @@ class XForm(models.Model):
                         )
                 elif vardict[path][u"type"] in cleaner:
                     data[path] = cleaner[vardict[path][u"type"]](data[path])
-        
-        data[u'_district_id'] = self.calculate_district_id(data)
         
     def __unicode__(self):
         return getattr(self, "id_string", "")
