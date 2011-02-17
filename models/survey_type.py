@@ -5,3 +5,6 @@ class SurveyType(models.Model):
 
     class Meta:
         app_label = 'xform_manager'
+
+    def __unicode__(self):
+        return "SurveyType: %s" % self.slug
