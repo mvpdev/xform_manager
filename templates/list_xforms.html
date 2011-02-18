@@ -28,19 +28,19 @@ List XForms
 		<tr>
 			{% if xform.downloadable %}
 			<td class='centered'>
-				<a href="x/{{xform.id}}" class="edit">[ edit ]</a>
-				<a href="x/{{xform.id}}/hide" class="delete">[ hide ]</a>
+				<a href="xform/{{xform.id}}" class="edit">[ edit ]</a>
+				<a href="xform/{{xform.id}}/hide" class="delete">[ hide ]</a>
 			</td>
 			<td class='centered'>
-				<span class="downloadable true">Downloadable</span>
+				<a href="xform/{{xform.id}}.xml"><span class="downloadable true">Downloadable</span></a>
 			</td>
 			{% else %}
 			<td class='centered'>
-				<a href="x/{{xform.id}}" class="edit">[ edit ]</a>
-				<a href="x/{{xform.id}}/show" class="delete">[ show ]</a>
+				<a href="xform/{{xform.id}}" class="edit">[ edit ]</a>
+				<a href="xform/{{xform.id}}/show" class="delete">[ show ]</a>
 			</td>
 			<td class='centered'>
-				<span class="downloadable false">Not Downloadable</span>
+				<a href="xform/{{xform.id}}.xml"><span class="downloadable false">Not Downloadable</span></a>
 			</td>
 			{% endif %}
 			<td class='centered'>
@@ -62,5 +62,5 @@ List XForms
 -->
 </script>
 <br />
-<a href="x/new" class="button">Add XForm</a>
+<a href="xform/new" class="button">Add XForm</a>
 {% endblock %}
