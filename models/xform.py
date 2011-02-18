@@ -62,8 +62,8 @@ class XForm(models.Model):
     def save(self, *args, **kwargs):
         self.guarantee_parser()
         self.id_string = self.parser.get_id_string()
-        if settings.STRICT:
-            assert re.search(r"^[\w-]+$", self.id_string), "Make sure this is a slug."
+        if settings.STRICT and not re.search(r"^[\w-]+$", self.id_string):
+            raise Exception("In strict mode, the XForm ID must be a valid slug and contain no spaces.")
         self.title = self.parser.get_title()
         super(XForm, self).save(*args, **kwargs)
 
