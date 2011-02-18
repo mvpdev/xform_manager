@@ -7,9 +7,9 @@ from django.core.urlresolvers import reverse
 from . import views
 
 # Here are some url names that we'll need to reference multiple times.
-DOWNLOAD_XFORM = "download-xform"
+DOWNLOAD_XFORM = "download_xform"
 LIST_XFORMS = "list_xforms"
-FORM_LIST = "form-list"
+FORM_LIST = "form_list"
 
 #ODK Collect URLS:
 #-general:
