@@ -53,8 +53,8 @@ def submission(request):
             "We need to improve our error messages and logging."
             )
 
-def download_xform(request, id, group_name=None):
-    xform = XForm.objects.get(id=id)
+def download_xform(request, id_string, group_name=None):
+    xform = XForm.objects.get(id_string=id_string)
     return HttpResponse(
         xform.xml,
         mimetype="application/xml"
@@ -96,16 +96,18 @@ class UpdateXForm(ModelForm):
         model = XForm
         fields = ("web_title", "downloadable", "description", "groups",)
 
-def show_xform(request, id):
+def show_xform(request, id_string, group_name=None):
+    xform = XForm.objects.get(id_string=id_string)
     return update_object(
         request=request,
-        object_id=id,
+        object_id=xform.id,
         form_class=UpdateXForm,
         template_name="form.html",
         post_save_redirect="/",
         )
 
-def update_xform(request, pk):
+def update_xform(request, id_string):
+    XForm.objects.get(id_string=id_string)
     return update_object(
         request=request,
         object_id=pk,
@@ -116,8 +118,8 @@ def update_xform(request, pk):
 
 # (D)elete: we won't let a user actually delete an XForm but they can
 # hide XForms using the (U)pdate view
-def show_hide_xform(request, pk, show_hide):
-    xform = XForm.objects.filter(id=pk)[0]
+def show_hide_xform(request, id_string, show_hide="hide", group_name=None):
+    xform = XForm.objects.get(id_string=id_string)
     if show_hide=="show":
         xform.downloadable=True
     else:

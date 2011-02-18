@@ -51,7 +51,7 @@ class XForm(models.Model):
     def url(self):
         return reverse(
             "download_xform",
-            kwargs={"id" : self.id},
+            kwargs={"id_string" : self.id_string},
             )
 
     def guarantee_parser(self):

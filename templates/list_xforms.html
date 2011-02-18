@@ -28,19 +28,19 @@ List XForms
 		<tr>
 			{% if xform.downloadable %}
 			<td class='centered'>
-				<a href="xform/{{xform.id}}" class="edit">[ edit ]</a>
-				<a href="xform/{{xform.id}}/hide" class="delete">[ hide ]</a>
+				<a href="xform/{{xform.id_string}}" class="edit">[ edit ]</a>
+				<a href="xform/{{xform.id_string}}/hide" class="delete">[ hide ]</a>
 			</td>
 			<td class='centered'>
-				<a href="xform/{{xform.id}}.xml"><span class="downloadable true">Downloadable</span></a>
+				<a href="xform/{{xform.id_string}}.xml"><span class="downloadable true">Downloadable</span></a>
 			</td>
 			{% else %}
 			<td class='centered'>
-				<a href="xform/{{xform.id}}" class="edit">[ edit ]</a>
-				<a href="xform/{{xform.id}}/show" class="delete">[ show ]</a>
+				<a href="xform/{{xform.id_string}}" class="edit">[ edit ]</a>
+				<a href="xform/{{xform.id_string}}/show" class="delete">[ show ]</a>
 			</td>
 			<td class='centered'>
-				<a href="xform/{{xform.id}}.xml"><span class="downloadable false">Not Downloadable</span></a>
+				<a href="xform/{{xform.id_string}}.xml"><span class="downloadable false">Not Downloadable</span></a>
 			</td>
 			{% endif %}
 			<td class='centered'>
