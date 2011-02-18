@@ -53,8 +53,8 @@ def submission(request):
             "We need to improve our error messages and logging."
             )
 
-def download_xform(request, id_string):
-    xform = XForm.objects.get(id_string=id_string)
+def download_xform(request, id, group_name=None):
+    xform = XForm.objects.get(id=id)
     return HttpResponse(
         xform.xml,
         mimetype="application/xml"
@@ -65,8 +65,6 @@ def list_xforms(request, group_name=None):
     xforms = XForm.objects.all()
     if group_name:
         xforms = xforms.filter(groups__name=group_name)
-#    xforms = XForm.objects.filter(downloadable=True) if not group_name \
-#        else XForm.objects.filter(downloadable=True, groups__name=group_name)
     return render_to_response(
         "list_xforms.html",
         {"xforms" : xforms}
