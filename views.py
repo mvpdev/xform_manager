@@ -4,7 +4,7 @@
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.forms import ModelForm
 from django.views.generic.create_update import create_object, update_object
 from django.core.urlresolvers import reverse
@@ -61,6 +61,17 @@ def download_xform(request, id_string):
         )
 
 
+def list_xforms(request, group_name=None):
+    xforms = XForm.objects.all()
+    if group_name:
+        xforms = xforms.filter(groups__name=group_name)
+#    xforms = XForm.objects.filter(downloadable=True) if not group_name \
+#        else XForm.objects.filter(downloadable=True, groups__name=group_name)
+    return render_to_response(
+        "list_xforms.html",
+        {"xforms" : xforms}
+        )
+
 # This following code bothers me a little bit, it seems perfectly
 # suited to be put in the Django admin.
 
@@ -71,22 +82,15 @@ class CreateXForm(ModelForm):
         model = XForm
         exclude = ("id_string", "title",)
 
-def create_xform(request):
+def create_xform(request, group_name=None):
     return create_object(
         request=request,
         form_class=CreateXForm,
         template_name="form.html",
-        post_save_redirect=reverse("list-xforms"),
+        post_save_redirect=reverse("list_xforms"),
         )
 
 # (R)ead using a nice list
-def list_xforms(request, group_name):
-    xforms = XForm.objects.filter(downloadable=True) if not group_name \
-        else XForm.objects.filter(downloadable=True, groups__name=group_name)
-    return render_to_response(
-        "list_xforms.html",
-        {"xforms" : xforms}
-        )
 
 # (U)pdate using another ModelForm
 class UpdateXForm(ModelForm):
@@ -94,14 +98,31 @@ class UpdateXForm(ModelForm):
         model = XForm
         fields = ("web_title", "downloadable", "description", "groups",)
 
+def show_xform(request, id):
+    return update_object(
+        request=request,
+        object_id=id,
+        form_class=UpdateXForm,
+        template_name="form.html",
+        post_save_redirect="/",
+        )
+
 def update_xform(request, pk):
     return update_object(
         request=request,
         object_id=pk,
         form_class=UpdateXForm,
         template_name="form.html",
-        post_save_redirect=reverse("list-xforms"),
+        post_save_redirect=reverse("list_xforms"),
         )
 
 # (D)elete: we won't let a user actually delete an XForm but they can
 # hide XForms using the (U)pdate view
+def show_hide_xform(request, pk, show_hide):
+    xform = XForm.objects.filter(id=pk)[0]
+    if show_hide=="show":
+        xform.downloadable=True
+    else:
+        xform.downloadable=False
+    xform.save()
+    return HttpResponseRedirect(reverse("list_xforms"))

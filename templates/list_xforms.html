@@ -26,14 +26,19 @@ List XForms
 	<tbody>
 {% for xform in xforms %}
 		<tr>
-			<td class='centered'>
-				<a href="../update-xform/{{xform.id}}/" class="edit">[ edit ]</a>
-			</td>
 			{% if xform.downloadable %}
+			<td class='centered'>
+				<a href="x/{{xform.id}}" class="edit">[ edit ]</a>
+				<a href="x/{{xform.id}}/hide" class="delete">[ hide ]</a>
+			</td>
 			<td class='centered'>
 				<span class="downloadable true">Downloadable</span>
 			</td>
 			{% else %}
+			<td class='centered'>
+				<a href="x/{{xform.id}}" class="edit">[ edit ]</a>
+				<a href="x/{{xform.id}}/show" class="delete">[ show ]</a>
+			</td>
 			<td class='centered'>
 				<span class="downloadable false">Not Downloadable</span>
 			</td>
@@ -57,10 +62,5 @@ List XForms
 -->
 </script>
 <br />
-<a href="../create-xform/" class="button">Add New XForm</a>
-<script type="text/javascript" charset="utf-8">
-<!--
-	$('a.button').button();
--->
-</script>
+<a href="x/new" class="button">Add XForm</a>
 {% endblock %}
