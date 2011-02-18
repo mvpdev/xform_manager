@@ -43,8 +43,8 @@ urlpatterns = patterns('',
     url(r"^%ssubmission$" % OPT_GROUP_REGEX, views.submission),
 
     url(r"^%sxform/new/$" % OPT_GROUP_REGEX, views.create_xform),
-    url(r"^%sxform/(?P<id_string>\S+)\.xml$" % OPT_GROUP_REGEX, views.download_xform, name=DOWNLOAD_XFORM),
-    url(r"^%sxform/(?P<id_string>\S+)/(?P<show_hide>(show|hide))$" % OPT_GROUP_REGEX, views.show_hide_xform),
-    url(r"^%sxform/(?P<id_string>\S+)/$" % OPT_GROUP_REGEX, views.show_xform),
+    url(r"^%sxform/(?P<id_string>[^/]+)\.xml$" % OPT_GROUP_REGEX, views.download_xform, name=DOWNLOAD_XFORM),
+    url(r"^%sxform/(?P<id_string>[^/]+)/(?P<show_hide>(show|hide))$" % OPT_GROUP_REGEX, views.show_hide_xform),
+    url(r"^%sxform/(?P<id_string>[^/]+)/$" % OPT_GROUP_REGEX, views.show_xform),
     url(r"^%s$" % OPT_GROUP_REGEX, views.list_xforms, name=LIST_XFORMS),
 )
