@@ -4,10 +4,14 @@ Testing POSTs to "/submission"
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 import os
-from .models import XForm
+from .models import XForm, Instance
 from . import urls
+import datetime
+
+from xform_manager.factory import XFormManagerFactory
 
 class TextXFormCreation(TestCase):
+
     def test_xform_creation(self):
         f = open(os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
@@ -25,6 +29,30 @@ class TextXFormCreation(TestCase):
         self.assertEqual(xform.title, "Registration")
         self.assertEqual(xform.file_name(), "Registration2010-12-04_09-34-00.xml")
         self.assertTrue(xform.url().endswith("Registration2010-12-04_09-34-00.xml"))
+
+class TextFactoryXFormCreation(TestCase):
+    def setUp(self):
+        self.xform_factory = XFormManagerFactory()
+
+    def test_factory_creation_of_registration_xform(self):
+        xf = self.xform_factory.create_registration_xform()
+        registration_form_count = XForm.objects.filter(title="Registration").count()
+        self.assertEqual(1, registration_form_count)
+    
+    def test_factory_creation_of_simple_xform(self):
+        xf = self.xform_factory.create_simple_xform()
+        all_form_count = XForm.objects.count()
+        self.assertEqual(1, all_form_count)
+    
+    def test_factory_creation_of_registration_instance(self):
+        self.assertEqual(0, Instance.objects.count())
+        xi = self.xform_factory.create_registration_instance()
+        self.assertEqual(1, Instance.objects.count())
+    
+    def test_factory_creation_of_simple_instance(self):
+        self.assertEqual(0, Instance.objects.count())
+        xi = self.xform_factory.create_simple_instance()
+        self.assertEqual(1, Instance.objects.count())
 
 class TestFormSubmission(TestCase):
     def tests_formlist(self):
