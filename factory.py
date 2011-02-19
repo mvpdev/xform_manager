@@ -12,7 +12,7 @@ class XFormManagerFactory(object):
         Gets a registration xform. (currently loaded in from fixture)
         Returns it without saving.
         """
-        return load_xform_from_xml_file("xform_manager/fixtures/test_forms/registration/forms/test_registration.xml")
+        return _load_xform_from_xml_file("xform_manager/fixtures/test_forms/registration/forms/test_registration.xml")
         
     def create_registration_xform(self):
         """
@@ -35,7 +35,7 @@ class XFormManagerFactory(object):
             xf = registration_xforms[0]
         
         custom_values.update({'form_id': xf.id_string})
-        return load_registration_with_values(custom_values)
+        return _load_registration_with_values(custom_values)
     
     def create_registration_instance(self, custom_values={}):
         i = self.get_registration_instance(custom_values)
@@ -46,7 +46,7 @@ class XFormManagerFactory(object):
         """
         Loads a simple XForm and returns. (Currently using the watersimple fixture)
         """
-        return load_xform_from_xml_file("xform_manager/fixtures/test_forms/water_simple/forms/WaterSimple.xml")
+        return _load_xform_from_xml_file("xform_manager/fixtures/test_forms/water_simple/forms/WaterSimple.xml")
     
     def create_simple_xform(self):
         xf = self.get_simple_xform()
@@ -61,7 +61,7 @@ class XFormManagerFactory(object):
             xf = simple_xforms[0]
     
         custom_values.update({'form_id': xf.id_string})
-        return load_simple_submission(custom_values)
+        return _load_simple_submission(custom_values)
     
     def create_simple_instance(self, custom_values={}):
         i = self.get_simple_instance(custom_values)
@@ -71,12 +71,12 @@ class XFormManagerFactory(object):
 
 XFORM_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.000"
 
-def load_xform_from_xml_file(filename):
+def _load_xform_from_xml_file(filename):
     xf = XForm()
     xf.xml = open(filename).read()
     return xf
 
-def load_registration_with_values(custom_values):
+def _load_registration_with_values(custom_values):
     """
     A hacky way to load values into an XForm, but it *works*. Let's replace this
     when we can find a way to do this better.
@@ -110,7 +110,7 @@ def load_registration_with_values(custom_values):
     return Instance(xml=registration_xml_template)
 
 
-def load_simple_submission(custom_values):
+def _load_simple_submission(custom_values):
     values = {
         'form_id': 'build_WaterSimple_1295821382',
         'name': 'Site Name',
