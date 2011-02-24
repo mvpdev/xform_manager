@@ -28,7 +28,7 @@ class XFormManagerFactory(object):
         
         2. Loads a registration instance.
         """
-        registration_xforms = XForm.objects.filter(title="Registration")
+        registration_xforms = XForm.objects.filter(id_string="Registration2010-12-04_09-34-00")
         if registration_xforms.count() == 0:
             xf = self.create_registration_xform()
         else:
@@ -54,7 +54,7 @@ class XFormManagerFactory(object):
         return xf
     
     def get_simple_instance(self, custom_values={}):
-        simple_xforms = XForm.objects.filter(title="build_WaterSimple_1295821382")
+        simple_xforms = XForm.objects.filter(id_string="build_WaterSimple_1295821382")
         if simple_xforms.count() == 0:
             xf = self.create_simple_xform()
         else:
