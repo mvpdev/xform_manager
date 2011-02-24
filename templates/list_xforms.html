@@ -3,29 +3,45 @@
 List XForms
 {% endblock %}
 {% block content %}
-<table class="pretty fullw">
+<table class="pretty padded fullw">
 	<thead>
 		<tr>
 			<th>
-				
-			</th>
-			<th>
-				Public?
-			</th>
-			<th>
-				Title
+				Form Name
 			</th>
 			<th>
 				Number of Submissions
 			</th>
 			<th>
-				Date of Last Submission
+				Last Submission
+			</th>
+			<th>
+				View Submissions
+			</th>
+			<th>
+				CSV
 			</th>
 		</tr>
 	</thead>
 	<tbody>
 {% for xform in xforms %}
 		<tr>
+			<td>
+				{{xform.title}}
+			</td>
+			<td>
+				{{xform.submission_count}}
+			</td>
+			<td>
+				{{xform.date_of_last_submission}}
+			</td>
+			<td>
+				<a href="#" class="button">View Submissions</a>
+			</td>
+			<td>
+				<a href="#" class="button">Download CSV</a>
+			</td>
+			<!--
 			{% if xform.downloadable %}
 			<td class='centered'>
 				<a href="xform/{{xform.id_string}}" class="edit">[ edit ]</a>
@@ -52,6 +68,7 @@ List XForms
 			<td class='centered'>
 				{{ xform.date_of_last_submission }}
 			</td>
+			-->
 		</tr>
 {% endfor %}
 	</tbody>

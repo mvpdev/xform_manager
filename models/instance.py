@@ -8,6 +8,8 @@ from .. import utils, tag
 class Instance(models.Model):
     # I should rename this model, maybe Survey
     xml = models.TextField()
+
+    #using instances instead of surveys breaks django
     xform = models.ForeignKey(XForm, related_name="surveys")
     start_time = models.DateTimeField()
     date = models.DateField()

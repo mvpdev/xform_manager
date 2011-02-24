@@ -98,7 +98,7 @@ class XForm(models.Model):
     submission_count.short_description = "Submission Count"
 
     def date_of_last_submission(self):
-        qs = self.instances().sort(tag.DATE_TIME_END)
+        qs = self.surveys.sort(tag.DATE_TIME_END)
         if qs.count()==0: return None
         # return the newest instance
         return qs[0][tag.DATE_TIME_END]
