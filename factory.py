@@ -157,7 +157,8 @@ class XFormManagerFactory(object):
         values = {
             'device_id': '12345',
             'start': '2011-01-01T09:50:06.966',
-            'end': '2011-01-01T09:53:22.965'
+            'end': '2011-01-01T09:53:22.965',
+            'geopoint': '40.783594633609184 -73.96436698913574 300.0 4.0'
         }
         
         if 'start' in custom_values:
