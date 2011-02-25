@@ -80,18 +80,3 @@ class TestFormSubmission(TestCase):
         response = self.client.post("/submission", post_data)
         # self.assertEqual(response.status_code, 200)
 
-from xform_manager.factory import XFormManagerFactory
-xfactory = XFormManagerFactory()
-
-import datetime
-
-class TestXFormModelFieldsForView(TestCase):
-    def test_date_of_last_submission(self):
-        """
-        tests the method "date_of_last_submission" from the xform model.
-        """
-        submit_time = datetime.datetime.now()
-        simple_xform = xfactory.create_simple_xform()
-        simple_instance = xfactory.create_simple_instance({'start': submit_time})
-        
-        self.assertEqual(simple_xform.date_of_last_submission(), submit_time)
