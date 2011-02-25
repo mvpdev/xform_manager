@@ -36,7 +36,7 @@ class TextFactoryXFormCreation(TestCase):
 
     def test_factory_creation_of_registration_xform(self):
         xf = self.xform_factory.create_registration_xform()
-        registration_form_count = XForm.objects.filter(title="Registration").count()
+        registration_form_count = XForm.objects.filter(title="registration").count()
         self.assertEqual(1, registration_form_count)
     
     def test_factory_creation_of_simple_xform(self):
@@ -92,6 +92,6 @@ class TestXFormModelFieldsForView(TestCase):
         """
         submit_time = datetime.datetime.now()
         simple_xform = xfactory.create_simple_xform()
-        simple_instance = xfactory.create_simple_instance({'start_time': submit_time})
+        simple_instance = xfactory.create_simple_instance({'start': submit_time})
         
         self.assertEqual(simple_xform.date_of_last_submission(), submit_time)
