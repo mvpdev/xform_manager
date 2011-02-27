@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 
 from json2xform import *
+from json2xform.builder import create_survey_element_from_dict
 
 XFORM_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.000"
 
