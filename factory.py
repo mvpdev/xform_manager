@@ -3,12 +3,13 @@
 
 from xform_manager.models import XForm, Instance
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from json2xform import *
 from json2xform.builder import create_survey_element_from_dict
 
 XFORM_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.000"
+ONE_HOUR = timedelta(0, 3600)
 
 def _load_registration_survey_object():
     """
@@ -115,7 +116,7 @@ class XFormManagerFactory(object):
             custom_values['start'] = st.strftime(XFORM_TIME_FORMAT)
 
             #if no end_time is specified, defaults to 1 hour
-            values['end'] = datetime(st.year, st.month, st.day, st.hour+1).strftime(XFORM_TIME_FORMAT)
+            values['end'] = (st+ONE_HOUR).strftime(XFORM_TIME_FORMAT)
         
         if 'end' in custom_values:
             custom_values['end'] = custom_values['end'].strftime(XFORM_TIME_FORMAT)
@@ -167,7 +168,7 @@ class XFormManagerFactory(object):
             custom_values['start'] = st.strftime(XFORM_TIME_FORMAT)
 
             #if no end_time is specified, defaults to 1 hour
-            values['end'] = datetime(st.year, st.month, st.day, st.hour+1).strftime(XFORM_TIME_FORMAT)
+            values['end'] = (st+ONE_HOUR).strftime(XFORM_TIME_FORMAT)
         
         if 'end' in custom_values:
             custom_values['end'] = custom_values['end'].strftime(XFORM_TIME_FORMAT)
