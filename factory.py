@@ -5,8 +5,8 @@ from xform_manager.models import XForm, Instance
 import os
 from datetime import datetime
 
-from json2xform import *
-from json2xform.builder import create_survey_element_from_dict
+from pyxform import *
+from pyxform.builder import create_survey_element_from_dict
 
 XFORM_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.000"
 
@@ -20,15 +20,15 @@ def _load_registration_survey_object():
         'type':'text','name':'name'
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load start time',
+        'type': 'start time',
         'name': 'start'
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load end time',
+        'type': 'end time',
         'name': 'end'
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load imei',
+        'type': 'imei',
         'name': 'device_id'
     }))
     return survey
@@ -57,15 +57,15 @@ def _load_simple_survey_object():
         'label': {'English':'Location'}
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load imei',
+        'type': 'imei',
         'name': 'device_id'
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load start time',
+        'type': 'start time',
         'name': 'start'
     }))
     survey.add_child(create_survey_element_from_dict({
-        'type': 'load end time',
+        'type': 'end time',
         'name': 'end'
     }))
     return survey
