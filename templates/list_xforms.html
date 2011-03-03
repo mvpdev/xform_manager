@@ -6,17 +6,15 @@ List XForms
 <table class="pretty padded fullw">
 	<thead>
 		<tr>
+		  <th>Downloadable by Phone</th>
 			<th>
-				Form Name
+				Form ID
 			</th>
 			<th>
 				Number of Submissions
 			</th>
 			<th>
-				Last Submission
-			</th>
-			<th>
-				View Submissions
+				Date of Last Submission
 			</th>
 			<th>
 				CSV
@@ -26,49 +24,33 @@ List XForms
 	<tbody>
 {% for xform in xforms %}
 		<tr>
+
+		  <td>
+		    <a href={% url xform_manager.views.toggle_downloadable id_string=xform.id_string %} class="delete">
+		      {% if xform.downloadable %}
+		      [ yes ]
+		      {% else %}
+		      [ no ]
+		      {% endif %}
+		    </a>
+		  </td>
+
+		  <td>
+		    <!-- <a href={% url xform_manager.views.update_xform id_string=xform.id_string %} class="edit">[ edit ]</a> -->
+		    {{ xform.id_string }}
+		  </td>
+
 			<td>
-				{{xform.title}}
+				{{ xform.submission_count }}
 			</td>
 			<td>
-				{{xform.submission_count}}
-			</td>
-			<td>
-				{{xform.date_of_last_submission}}
-			</td>
-			<td>
-				<a href="#" class="button">View Submissions</a>
+			  {% if xform.date_of_last_submission %}
+			  {{ xform.date_of_last_submission }}
+			  {% endif %}
 			</td>
 			<td>
 				<a href="#" class="button">Download CSV</a>
 			</td>
-			<!--
-			{% if xform.downloadable %}
-			<td class='centered'>
-				<a href="xform/{{xform.id_string}}" class="edit">[ edit ]</a>
-				<a href="xform/{{xform.id_string}}/hide" class="delete">[ hide ]</a>
-			</td>
-			<td class='centered'>
-				<a href="xform/{{xform.id_string}}.xml"><span class="downloadable true">Downloadable</span></a>
-			</td>
-			{% else %}
-			<td class='centered'>
-				<a href="xform/{{xform.id_string}}" class="edit">[ edit ]</a>
-				<a href="xform/{{xform.id_string}}/show" class="delete">[ show ]</a>
-			</td>
-			<td class='centered'>
-				<a href="xform/{{xform.id_string}}.xml"><span class="downloadable false">Not Downloadable</span></a>
-			</td>
-			{% endif %}
-			<td class='centered'>
-				{{ xform.title }}
-			</td>
-			<td class='centered'>
-				{{ xform.submission_count }}
-			</td>
-			<td class='centered'>
-				{{ xform.date_of_last_submission }}
-			</td>
-			-->
 		</tr>
 {% endfor %}
 	</tbody>

@@ -60,10 +60,11 @@ def download_xform(request, id_string, group_name=None):
         mimetype="application/xml"
         )
 
-
 def list_xforms(request, group_name=None):
     xforms = XForm.objects.all()
     if group_name:
+        # ideally this filtering should be done based on the user's
+        # group membership
         xforms = xforms.filter(groups__name=group_name)
     return render_to_response(
         "list_xforms.html",
@@ -96,33 +97,20 @@ class UpdateXForm(ModelForm):
         model = XForm
         fields = ("web_title", "downloadable", "description", "groups",)
 
-def show_xform(request, id_string, group_name=None):
+def update_xform(request, id_string):
     xform = XForm.objects.get(id_string=id_string)
     return update_object(
         request=request,
         object_id=xform.id,
         form_class=UpdateXForm,
         template_name="form.html",
-        post_save_redirect="/",
-        )
-
-def update_xform(request, id_string):
-    XForm.objects.get(id_string=id_string)
-    return update_object(
-        request=request,
-        object_id=pk,
-        form_class=UpdateXForm,
-        template_name="form.html",
-        post_save_redirect=reverse("list_xforms"),
+        post_save_redirect="/", #reverse("list_xforms"),
         )
 
 # (D)elete: we won't let a user actually delete an XForm but they can
 # hide XForms using the (U)pdate view
-def show_hide_xform(request, id_string, show_hide="hide", group_name=None):
+def toggle_downloadable(request, id_string):
     xform = XForm.objects.get(id_string=id_string)
-    if show_hide=="show":
-        xform.downloadable=True
-    else:
-        xform.downloadable=False
+    xform.downloadable = not xform.downloadable
     xform.save()
     return HttpResponseRedirect(reverse("list_xforms"))
