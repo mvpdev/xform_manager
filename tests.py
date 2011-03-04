@@ -7,6 +7,7 @@ import os
 from .models import XForm, Instance
 from . import urls
 import datetime
+import utils
 
 from xform_manager.factory import XFormManagerFactory
 
@@ -80,3 +81,29 @@ class TestFormSubmission(TestCase):
         response = self.client.post("/submission", post_data)
         # self.assertEqual(response.status_code, 200)
 
+    def test_parse_xform_instance(self):
+        xml_str = """<?xml version='1.0' ?><test id="test_id"><a>1</a><b>2</b></test>"""
+        expected_dict = {
+            u'_name': u'test',
+            u'_id_string': u'test_id',
+            u'a': u'1',
+            u'b': u'2',
+            }
+        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)
+
+        xml_str = """<?xml version='1.0' ?><test id="test_id"><a><b>2</b></a></test>"""
+        expected_dict = {
+            u'_name': u'test',
+            u'_id_string': u'test_id',
+            u'a/b': u'2',
+            }
+        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)
+
+        xml_str = """<?xml version='1.0' ?><test id="test_id"><b>1</b><b>2</b></test>"""
+        expected_dict = {
+            u'_name': u'test',
+            u'_id_string': u'test_id',
+            u'b[0]': u'1',
+            u'b[1]': u'2',
+            }
+        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)

@@ -10,6 +10,7 @@ from django.views.generic.create_update import create_object, update_object
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import Group
 from django.forms.models import ModelMultipleChoiceField
+from django.template import RequestContext
 
 import itertools
 from . models import XForm, get_or_create_instance
@@ -66,9 +67,10 @@ def list_xforms(request, group_name=None):
         # ideally this filtering should be done based on the user's
         # group membership
         xforms = xforms.filter(groups__name=group_name)
+    context = RequestContext(request, {"xforms" : xforms})
     return render_to_response(
         "list_xforms.html",
-        {"xforms" : xforms}
+        context_instance=context
         )
 
 # This following code bothers me a little bit, it seems perfectly
