@@ -83,27 +83,58 @@ class TestFormSubmission(TestCase):
 
     def test_parse_xform_instance(self):
         xml_str = """<?xml version='1.0' ?><test id="test_id"><a>1</a><b>2</b></test>"""
+        expected_obj = (u"test", [
+                (u"a", u"1"),
+                (u"b", u"2"),
+                ])
+        pyobj = utils._xmlstr2pyobj(xml_str)
+        self.assertEqual(pyobj, expected_obj)
         expected_dict = {
-            u'_name': u'test',
-            u'_id_string': u'test_id',
-            u'a': u'1',
-            u'b': u'2',
+            (u"test",) : 1,
+            (u"test", u"a") : 1,
+            (u"test", u"b") : 1,
             }
-        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)
+        self.assertEqual(utils._count_xpaths(pyobj), expected_dict)
+        self.assertEqual(utils.parse_xform_instance(xml_str), {
+                u'_name': u'test',
+                u'_id_string': u'test_id',
+                u'a': u'1',
+                u'b': u'2',
+                })
 
         xml_str = """<?xml version='1.0' ?><test id="test_id"><a><b>2</b></a></test>"""
+        expected_obj = (u"test", [
+                (u"a", [(u"b", u"2")])
+                ])
+        pyobj = utils._xmlstr2pyobj(xml_str)
+        self.assertEqual(pyobj, expected_obj)
         expected_dict = {
-            u'_name': u'test',
-            u'_id_string': u'test_id',
-            u'a/b': u'2',
+            (u"test",) : 1,
+            (u"test", u"a") : 1,
+            (u"test", u"a", u"b") : 1,
             }
-        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)
+        self.assertEqual(utils._count_xpaths(pyobj), expected_dict)
+        self.assertEqual(utils.parse_xform_instance(xml_str), {
+                u'_id_string': u'test_id',
+                u'a/b': u'2',
+                u'_name': u'test',
+                })
 
         xml_str = """<?xml version='1.0' ?><test id="test_id"><b>1</b><b>2</b></test>"""
+        expected_obj = (u'test', [
+                (u"b", u"1"),
+                (u"b", u"2"),
+                ])
+        pyobj = utils._xmlstr2pyobj(xml_str)
+        self.assertEqual(pyobj, expected_obj)
         expected_dict = {
-            u'_name': u'test',
-            u'_id_string': u'test_id',
-            u'b[0]': u'1',
-            u'b[1]': u'2',
+            (u"test",) : 1,
+            (u"test", u"b") : 2,
             }
-        self.assertEqual(utils.parse_xform_instance(xml_str), expected_dict)
+        self.assertEqual(utils._count_xpaths(pyobj), expected_dict)
+        self.assertEqual(utils.parse_xform_instance(xml_str), {
+                u'_name': u'test',
+                u'_id_string': u'test_id',
+                u'b[0]': u'1',
+                u'b[1]': u'2',
+                })
