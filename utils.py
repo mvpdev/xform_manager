@@ -18,10 +18,21 @@ def parse_xform_instance(xml_str):
     """
     xml_obj = minidom.parseString(xml_str)
     root_node = xml_obj.documentElement
-    # go through the xml object creating a corresponding python object
-    # NOTE: THIS WILL DESTROY ANY DATA COLLECTED WITH REPEATABLE NODES
-    # THIS IS OKAY FOR OUR USE CASE, BUT OTHER USERS SHOULD BEWARE.
-    survey_data = dict(_path_value_pairs(root_node))
+    pyobj = _node2pyobj(root_node)
+
+    # go through the xml object creating a corresponding python
+    # object. note: we're immediately flattening out the document,
+    # this is primarily because we haven't upgraded to Python 2.7, I'm
+    # thinking OrderedDict could come in very handy here.
+    xpath_counts = {}
+    xpath_value_pairs = list(
+        _xpath_value_pairs(pyobj, xpath_counts, [])
+        )
+    survey_data = {}
+    for annotated_xpath, value in xpath_value_pairs:
+        xpath_str = _xpath_str(annotated_xpath, xpath_counts)
+        survey_data[xpath_str] = value
+
     assert len(list(_all_attributes(root_node)))==1, \
         u"There should be exactly one attribute in this document."
     survey_data.update({
@@ -30,31 +41,84 @@ def parse_xform_instance(xml_str):
             })
     return survey_data
 
-def _path(node):
-    n = node
-    levels = []
-    while n.nodeType!=n.DOCUMENT_NODE:
-        levels = [n.nodeName] + levels
-        n = n.parentNode
-    return SLASH.join(levels[1:])
-
-def _path_value_pairs(node):
+def _xpath_str(xpath_with_counts, xpath_counts):
     """
-    Using a depth first traversal of the xml nodes build up a python
-    object in parent that holds the tree structure of the data.
+    Note: This must be called with the final xpath_counts. Go through
+    an xpath with count annotations and return a string representation
+    of this xpath. Something like 'a/b[0]/c'.
+    """
+    path = []
+    for i in range(len(xpath_with_counts)):
+        xpath_tuple = tuple([pair[0] for pair in xpath_with_counts[:i+1]])
+        path.append(xpath_with_counts[i][0])
+        if xpath_counts[xpath_tuple]>0:
+            path[-1] += "[%s]" % xpath_with_counts[i][1]
+    return SLASH.join(path[1:])
+
+def _add_counts(xpath, xpath_counts):
+    """
+    Annotates an xpath with the current counts in xpath_counts.
+    """
+    return [(xpath[i], xpath_counts[tuple(xpath[:i+1])]) for i in range(len(xpath))]
+
+def _update_xpath_counts(xpath, xpath_counts):
+    """
+    Add this xpath to the dictionary of xpath counts.
+    """
+    xpath_tuple = tuple(xpath)
+    if xpath_tuple in xpath_counts: xpath_counts[xpath_tuple] += 1
+    else: xpath_counts[xpath_tuple] = 0
+
+def _xmlstr2pyobj(xml_str):
+    xml_obj = minidom.parseString(xml_str)
+    root_node = xml_obj.documentElement
+    return _node2pyobj(root_node)
+
+def _node2pyobj(node):
+    """
+    Return a Python object that represents the same data as this XML
+    node.
     """
     if len(node.childNodes)==0:
         # there's no data for this leaf node
-        yield _path(node), None
-    elif len(node.childNodes)==1 and \
-            node.childNodes[0].nodeType==node.TEXT_NODE:
+        return node.nodeName, None
+    elif len(node.childNodes)==1 and node.childNodes[0].nodeType==node.TEXT_NODE:
         # there is data for this leaf node
-        yield _path(node), node.childNodes[0].nodeValue
+        return node.nodeName, node.childNodes[0].nodeValue
     else:
         # this is an internal node
-        for child in node.childNodes:
-            for pair in _path_value_pairs(child):
-                yield pair
+        return node.nodeName, [_node2pyobj(child) for child in node.childNodes]
+
+def _construct_xpath_counts(pair, xpath_counts, xpath_so_far):
+    """
+    Add this xpath to the dictionary of xpath counts.
+    """
+    name, value = pair
+    xpath = xpath_so_far + [name]
+    xpath_tuple = tuple(xpath)
+    if xpath_tuple in xpath_counts: xpath_counts[xpath_tuple] += 1
+    else: xpath_counts[xpath_tuple] = 1
+    if type(value)==list:
+        for child in value:
+            _construct_xpath_counts(child, xpath_counts, xpath)
+
+def _count_xpaths(pair):
+    result = {}
+    _construct_xpath_counts(pair, result, [])
+    return result
+
+def _xpath_value_pairs(pair, xpath_counts, xpath_so_far):
+    name, value = pair
+    xpath = xpath_so_far + [name]
+    _update_xpath_counts(xpath, xpath_counts)
+    xpath_with_counts = _add_counts(xpath, xpath_counts)
+
+    if type(value)!=list:
+        yield xpath_with_counts, value
+    else:
+        for child in value:
+            for xpath_value in _xpath_value_pairs(child, xpath_counts, xpath):
+                yield xpath_value
 
 def _all_attributes(node):
     """
