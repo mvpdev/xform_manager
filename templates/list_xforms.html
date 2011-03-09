@@ -7,6 +7,7 @@ List XForms
 	<thead>
 		<tr>
 		  <th>Downloadable by Phone</th>
+			<th></th>
 			<th>
 				Form ID
 			</th>
@@ -36,7 +37,11 @@ List XForms
 		  </td>
 
 		  <td>
-		    <!-- <a href={% url xform_manager.views.update_xform id_string=xform.id_string %} class="edit">[ edit ]</a> -->
+			<!-- By request -->
+		    <a href="/admin/xform_manager/xform/{{xform.id}}/" class="edit">[ edit ]</a>
+		  </td>
+		
+	      <td>
 		    {{ xform.id_string }}
 		  </td>
 
