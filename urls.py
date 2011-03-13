@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     url(r"^%sxform/new/$" % OPT_GROUP_REGEX, views.create_xform),
     url(r"^%sxform/(?P<id_string>[^/]+)\.xml$" % OPT_GROUP_REGEX, views.download_xform, name=DOWNLOAD_XFORM),
     url(r"^xform/toggle_downloadable/(?P<id_string>[^/]+)/$", views.toggle_downloadable),
+    url(r"^submission_test_form/?$", views.submission_test_form),
     url(r"^xform/(?P<id_string>[^/]+)/$", views.update_xform),
     url(r"^%s$" % OPT_GROUP_REGEX, views.list_xforms, name=LIST_XFORMS),
 )

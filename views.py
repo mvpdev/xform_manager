@@ -73,6 +73,10 @@ def list_xforms(request, group_name=None):
         context_instance=context
         )
 
+def submission_test_form(request):
+    """ This view is only for debugging. Do not link to this page. """
+    return render_to_response("submission_test_form.html")
+
 # This following code bothers me a little bit, it seems perfectly
 # suited to be put in the Django admin.
 
