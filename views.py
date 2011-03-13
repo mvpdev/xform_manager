@@ -22,7 +22,7 @@ def formList(request, group_name):
         else XForm.objects.filter(downloadable=True, groups__name=group_name)
     return render_to_response(
         "formList.xml",
-        {"xforms" : xforms},
+        {"xforms" : xforms, 'root_url': 'http://%s' % request.get_host()},
         mimetype="application/xml"
         )
 
