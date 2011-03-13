@@ -71,15 +71,20 @@ class TestFormSubmission(TestCase):
         """
         xml_submission_file is the field name for the posted xml file.
         """
+        tfile_path = "simple.xml"
+        tfile_w = open(tfile_path, 'w')
+        tfile_w.write("<?xml version='1.0' ?><Example id='Simple Photo Survey'><Location><Picture>1286990143958.jpg</Picture></Location></Example>")
+        tfile_w.close()
+        
+        tfile = open(tfile_path, 'r')
         post_data = {
-            "xml_submission_file" : (
-                "filename.xml",
-                #this xml text is not the right way to post a file, so should be replaced.
-                "<?xml version='1.0' ?><Example id='Simple Photo Survey'><Location><Picture>1286990143958.jpg</Picture></Location></Example>",
-            )
+            "xml_submission_file" : tfile,
         }
+        # I wish django testcase made it easier to test file uploads....!
         response = self.client.post("/submission", post_data)
-        # self.assertEqual(response.status_code, 200)
+        tfile.close()
+        
+        self.assertEqual(response.status_code, 201)
 
     def test_parse_xform_instance(self):
         xml_str = """<?xml version='1.0' ?><test id="test_id"><a>1</a><b>2</b></test>"""
