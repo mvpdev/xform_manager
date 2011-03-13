@@ -9,7 +9,7 @@ from . import urls
 import datetime
 import utils
 
-from xform_manager.factory import XFormManagerFactory
+from xform_manager.factory import XFormManagerFactory, _load_registration_survey_object
 
 class TextXFormCreation(TestCase):
 
@@ -56,6 +56,10 @@ class TextFactoryXFormCreation(TestCase):
         self.assertEqual(1, Instance.objects.count())
 
 class TestFormSubmission(TestCase):
+    def setUp(self):
+        self.xform_factory = XFormManagerFactory()
+        self.registration_form = self.xform_factory.create_registration_xform()
+    
     def tests_formlist(self):
         response = self.client.get(reverse(urls.FORM_LIST))
         self.assertEqual(response.status_code, 200)
@@ -71,9 +75,15 @@ class TestFormSubmission(TestCase):
         """
         xml_submission_file is the field name for the posted xml file.
         """
-        tfile_path = "simple.xml"
+        pz = _load_registration_survey_object().instantiate()
+        pz.answer('start', '2011-01-01T09:50:06.966')
+        pz.answer('end', '2011-01-01T09:53:22.965')
+        pz.answer('device_id', '98765')
+        pz.answer('name', 'Stewie')
+        
+        tfile_path = "registration.xml"
         tfile_w = open(tfile_path, 'w')
-        tfile_w.write("<?xml version='1.0' ?><Example id='Simple Photo Survey'><Location><Picture>1286990143958.jpg</Picture></Location></Example>")
+        tfile_w.write(pz.to_xml())
         tfile_w.close()
         
         tfile = open(tfile_path, 'r')
