@@ -1,4 +1,4 @@
-from .instance import Instance
+from .instance import Instance, INSTANCE_PROCESS_SIGNAL
 from .xform import XForm
 from .attachment import Attachment
 from .survey_type import SurveyType
