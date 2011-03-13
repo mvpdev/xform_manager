@@ -28,7 +28,7 @@ def formList(request, group_name):
 
 @require_POST
 @csrf_exempt
-def submission(request):
+def submission(request, group_name):
     # request.FILES is a django.utils.datastructures.MultiValueDict
     # for each key we have a list of values
     try:
