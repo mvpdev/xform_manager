@@ -79,7 +79,10 @@ class TestFormSubmission(TestCase):
             )
         }
         response = self.client.post("/submission", post_data)
-        # self.assertEqual(response.status_code, 200)
+        
+        # We should ALWAYS return a happy status code on an entact submission
+        # of a "xml_submission_file".
+        self.assertEqual(response.status_code, 200)
 
     def test_parse_xform_instance(self):
         xml_str = """<?xml version='1.0' ?><test id="test_id"><a>1</a><b>2</b></test>"""
