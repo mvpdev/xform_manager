@@ -1,3 +1,3 @@
 from old_tests import *
-from water_submission_test import *
+from instance_creation_test import *
      
