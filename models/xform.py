@@ -26,7 +26,7 @@ cleaner = {
 class XForm(models.Model):
     # web_title is used if the user wants to display a different title
     # on the website
-    web_title = models.CharField(max_length=64)
+    web_title = models.CharField(max_length=64, blank=True, default="")
     downloadable = models.BooleanField()
     description = models.TextField(blank=True, null=True, default="")
     groups = models.ManyToManyField(
