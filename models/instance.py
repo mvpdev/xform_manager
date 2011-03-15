@@ -17,8 +17,8 @@ class Instance(models.Model):
 
     #using instances instead of surveys breaks django
     xform = models.ForeignKey(XForm, null=True, related_name="surveys")
-    start_time = models.DateTimeField()
-    date = models.DateField()
+    start_time = models.DateTimeField(null=True)
+    date = models.DateField(null=True)
     survey_type = models.ForeignKey(SurveyType)
 
     class Meta:
@@ -37,10 +37,11 @@ class Instance(models.Model):
             SurveyType.objects.get_or_create(slug=doc[tag.INSTANCE_DOC_NAME])
 
     def _set_start_time(self, doc):
-        self.start_time = doc[tag.DATE_TIME_START]
+        self.start_time = doc.get(tag.DATE_TIME_START, None)
 
     def _set_date(self, doc):
-        self.date = doc[tag.DATE_TIME_START].date()
+        start_date = doc.get(tag.DATE_TIME_START, None)
+        if start_date: self.date = start_date.date()
 
     def save(self, *args, **kwargs):
         doc = utils.parse_xform_instance(self.xml)
