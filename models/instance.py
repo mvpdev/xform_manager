@@ -5,12 +5,18 @@ from .xform import XForm
 from .survey_type import SurveyType
 from .. import utils, tag
 
+def log(*args, **kwargs):
+    """
+    This is a place holder for a real logging function.
+    """
+    pass
+
 class Instance(models.Model):
     # I should rename this model, maybe Survey
     xml = models.TextField()
 
     #using instances instead of surveys breaks django
-    xform = models.ForeignKey(XForm, related_name="surveys")
+    xform = models.ForeignKey(XForm, null=True, related_name="surveys")
     start_time = models.DateTimeField()
     date = models.DateField()
     survey_type = models.ForeignKey(SurveyType)
@@ -22,10 +28,9 @@ class Instance(models.Model):
         try:
             self.xform = XForm.objects.get(id_string=doc[tag.XFORM_ID_STRING])
         except XForm.DoesNotExist:
-            raise utils.MyError(
-                "Missing corresponding XForm: %s" % \
-                doc[tag.XFORM_ID_STRING]
-                )
+            self.xform = None
+            log("The corresponding XForm definition is missing",
+                doc[tag.XFORM_ID_STRING])
 
     def _set_survey_type(self, doc):
         self.survey_type, created = \
@@ -40,7 +45,7 @@ class Instance(models.Model):
     def save(self, *args, **kwargs):
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
-        self.xform.clean_instance(doc)
+        if self.xform: self.xform.clean_instance(doc)
         self._set_start_time(doc)
         self._set_date(doc)
         self._set_survey_type(doc)
