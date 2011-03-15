@@ -57,3 +57,20 @@ class Instance(models.Model):
         doc = utils.parse_xform_instance(self.xml)
         self.xform.clean_instance(doc)
         return doc
+
+    def get_list_of_pairs(self):
+        return utils._xmlstr2pyobj(self.xml)
+
+    def as_html(self):
+        def pair2html(pair, level):
+            if type(pair[1])==list:
+                # note we should deal with levels of headers here
+                result = "<h%(level)s>%(key)s</h%(level)s>" % \
+                    {"level" : level, "key" : pair[0]}
+                for value in pair[1]:
+                    result += pair2html(value, level+1)
+                return result
+            else:
+                return "%(key)s : %(value)s<br/>" % \
+                    {"key" : pair[0], "value" : pair[1]}
+        return pair2html(self.get_list_of_pairs(), 1)

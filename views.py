@@ -13,7 +13,7 @@ from django.forms.models import ModelMultipleChoiceField
 from django.template import RequestContext
 
 import itertools
-from . models import XForm, get_or_create_instance
+from . models import XForm, get_or_create_instance, Instance
 
 @require_GET
 def formList(request, group_name):
@@ -120,3 +120,7 @@ def toggle_downloadable(request, id_string):
     xform.downloadable = not xform.downloadable
     xform.save()
     return HttpResponseRedirect(reverse("list_xforms"))
+
+def instance(request, pk):
+    instance = Instance.objects.get(pk=pk)
+    return HttpResponse(instance.as_html())

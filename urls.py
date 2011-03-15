@@ -48,4 +48,5 @@ urlpatterns = patterns('',
     url(r"^submission_test_form/?$", views.submission_test_form),
     url(r"^xform/(?P<id_string>[^/]+)/$", views.update_xform),
     url(r"^%s$" % OPT_GROUP_REGEX, views.list_xforms, name=LIST_XFORMS),
+    url(r"^survey/(?P<pk>\d+)/$", views.instance),
 )
