@@ -40,8 +40,9 @@ class TestWaterSubmission(TestCase):
                 "1300221157303.jpg"),
             "rb")
 
-        # I'm not sure if ODK Collect actually uses the key image_file
+        # ODK Collect uses the name of the jpg file as the key in the
+        # post.
         postdata = {"xml_submission_file" : xml_file,
-                    "image_file" : image_file}
+                    "1300221157303.jpg" : image_file}
         response = self.client.post('/submission', postdata)
         self.failUnlessEqual(response.status_code, 201)
