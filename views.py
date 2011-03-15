@@ -38,7 +38,10 @@ def submission(request, group_name):
             )
 
     # save this XML file and media files as attachments
-    media_files = list(itertools.chain(*request.FILES.values()))
+    
+    # what was the purpose of this list(itertools.chain('nonsense!')):
+    #     media_files = list(itertools.chain(*request.FILES.values()))
+    media_files = request.FILES.values()
     instance, created = get_or_create_instance(
         xml_file_list[0],
         media_files
