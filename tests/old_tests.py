@@ -3,11 +3,12 @@ Testing POSTs to "/submission"
 """
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
+from django.conf import settings
 import os
-from .models import XForm, Instance
-from . import urls
+from xform_manager.models import XForm, Instance
+from xform_manager import urls
+from xform_manager import utils
 import datetime
-import utils
 
 from xform_manager.factory import XFormManagerFactory, _load_registration_survey_object
 
@@ -15,7 +16,7 @@ class TextXFormCreation(TestCase):
 
     def test_xform_creation(self):
         f = open(os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
+                settings.PROJECT_ROOT, "xform_manager",
                 "fixtures", "test_forms", "registration", "forms",
                 "test_registration.xml"
                 ))
