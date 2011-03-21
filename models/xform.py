@@ -10,19 +10,6 @@ from django.contrib.auth.models import Group
 from django.conf import settings
 import re
 
-# these cleaners will be used when saving data
-# All cleaned types should be in this list
-cleaner = {
-    u'geopoint': lambda(x): dict(zip(
-            ["latitude", "longitude", "altitude", "accuracy"],
-            x.split()
-            )),
-    u'dateTime': lambda(x): datetime.datetime.strptime(
-        x.split(".")[0],
-        '%Y-%m-%dT%H:%M:%S'
-        ),
-    }
-
 class XForm(models.Model):
     # web_title is used if the user wants to display a different title
     # on the website
@@ -54,11 +41,6 @@ class XForm(models.Model):
             kwargs={"id_string" : self.id_string},
             )
 
-    def guarantee_parser(self):
-        # there must be a better way than this solution
-        if not hasattr(self, "parser"):
-            self.parser = utils.XFormParser(self.xml)
-
     def _set_id_string(self):
         text = re.sub(r"\s+", " ", self.xml)
         matches = re.findall(r'<instance>.*id="([^"]+)".*</instance>', text)
@@ -80,29 +62,6 @@ class XForm(models.Model):
         self._set_title()
         super(XForm, self).save(*args, **kwargs)
 
-    def clean_instance(self, data):
-        """
-                1. variable doesn't start with _
-                2. if variable doesn't exist in vardict log message
-                3. if there is data and a cleaner, clean that data
-        """            
-        self.guarantee_parser()
-        vardict = self.parser.get_variable_dictionary()
-        for path in data.keys():
-            if not path.startswith(u"_") and data[path]:
-                if path not in vardict:
-                    raise utils.MyError(
-                        "The XForm %(id_string)s does not describe all "
-                        "the variables seen in this instance. "
-                        "Specifically, there is no definition for "
-                        "%(path)s." % {
-                            "id_string" : self.id_string,
-                            "path" : path
-                            }
-                        )
-                elif vardict[path][u"type"] in cleaner:
-                    data[path] = cleaner[vardict[path][u"type"]](data[path])
-        
     def __unicode__(self):
         return getattr(self, "id_string", "")
 

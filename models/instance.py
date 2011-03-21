@@ -37,16 +37,16 @@ class Instance(models.Model):
             SurveyType.objects.get_or_create(slug=doc[tag.INSTANCE_DOC_NAME])
 
     def _set_start_time(self, doc):
-        self.start_time = doc.get(tag.DATE_TIME_START, None)
+        self.start_time = None # doc.get(tag.DATE_TIME_START, None)
 
     def _set_date(self, doc):
-        start_date = doc.get(tag.DATE_TIME_START, None)
-        if start_date: self.date = start_date.date()
+        self.date = None
+        # start_date = doc.get(tag.DATE_TIME_START, None)
+        # if start_date: self.date = start_date.date()
 
     def save(self, *args, **kwargs):
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
-        if self.xform: self.xform.clean_instance(doc)
         self._set_start_time(doc)
         self._set_date(doc)
         self._set_survey_type(doc)
@@ -54,9 +54,7 @@ class Instance(models.Model):
 
     def get_dict(self):
         """Return a python object representation of this instance's XML."""
-        doc = utils.parse_xform_instance(self.xml)
-        self.xform.clean_instance(doc)
-        return doc
+        return utils.parse_xform_instance(self.xml)
 
     def get_list_of_pairs(self):
         return utils._xmlstr2pyobj(self.xml)
