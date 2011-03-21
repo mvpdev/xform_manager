@@ -59,12 +59,25 @@ class XForm(models.Model):
         if not hasattr(self, "parser"):
             self.parser = utils.XFormParser(self.xml)
 
+    def _set_id_string(self):
+        text = re.sub(r"\s+", " ", self.xml)
+        matches = re.findall(r'<instance>.*id="([^"]+)".*</instance>', text)
+        if len(matches) != 1:
+            raise Exception("There should be a single id string.", matches)
+        self.id_string = matches[0]
+
+    def _set_title(self):
+        text = re.sub(r"\s+", " ", self.xml)
+        matches = re.findall(r"<h:title>([^<]+)</h:title>", text)
+        if len(matches) != 1:
+            raise Exception("There should be a single title.", matches)
+        self.title = u"" if not matches else matches[0]
+
     def save(self, *args, **kwargs):
-        self.guarantee_parser()
-        self.id_string = self.parser.get_id_string()
+        self._set_id_string()
         if settings.STRICT and not re.search(r"^[\w-]+$", self.id_string):
             raise Exception("In strict mode, the XForm ID must be a valid slug and contain no spaces.")
-        self.title = self.parser.get_title()
+        self._set_title()
         super(XForm, self).save(*args, **kwargs)
 
     def clean_instance(self, data):
