@@ -10,23 +10,10 @@ from django.contrib.auth.models import Group
 from django.conf import settings
 import re
 
-# these cleaners will be used when saving data
-# All cleaned types should be in this list
-cleaner = {
-    u'geopoint': lambda(x): dict(zip(
-            ["latitude", "longitude", "altitude", "accuracy"],
-            x.split()
-            )),
-    u'dateTime': lambda(x): datetime.datetime.strptime(
-        x.split(".")[0],
-        '%Y-%m-%dT%H:%M:%S'
-        ),
-    }
-
 class XForm(models.Model):
     # web_title is used if the user wants to display a different title
     # on the website
-    web_title = models.CharField(max_length=64)
+    web_title = models.CharField(max_length=64, blank=True, default="")
     downloadable = models.BooleanField()
     description = models.TextField(blank=True, null=True, default="")
     groups = models.ManyToManyField(
@@ -54,42 +41,27 @@ class XForm(models.Model):
             kwargs={"id_string" : self.id_string},
             )
 
-    def guarantee_parser(self):
-        # there must be a better way than this solution
-        if not hasattr(self, "parser"):
-            self.parser = utils.XFormParser(self.xml)
+    def _set_id_string(self):
+        text = re.sub(r"\s+", " ", self.xml)
+        matches = re.findall(r'<instance>.*id="([^"]+)".*</instance>', text)
+        if len(matches) != 1:
+            raise Exception("There should be a single id string.", matches)
+        self.id_string = matches[0]
+
+    def _set_title(self):
+        text = re.sub(r"\s+", " ", self.xml)
+        matches = re.findall(r"<h:title>([^<]+)</h:title>", text)
+        if len(matches) != 1:
+            raise Exception("There should be a single title.", matches)
+        self.title = u"" if not matches else matches[0]
 
     def save(self, *args, **kwargs):
-        self.guarantee_parser()
-        self.id_string = self.parser.get_id_string()
+        self._set_id_string()
         if settings.STRICT and not re.search(r"^[\w-]+$", self.id_string):
             raise Exception("In strict mode, the XForm ID must be a valid slug and contain no spaces.")
-        self.title = self.parser.get_title()
+        self._set_title()
         super(XForm, self).save(*args, **kwargs)
 
-    def clean_instance(self, data):
-        """
-                1. variable doesn't start with _
-                2. if variable doesn't exist in vardict log message
-                3. if there is data and a cleaner, clean that data
-        """            
-        self.guarantee_parser()
-        vardict = self.parser.get_variable_dictionary()
-        for path in data.keys():
-            if not path.startswith(u"_") and data[path]:
-                if path not in vardict:
-                    raise utils.MyError(
-                        "The XForm %(id_string)s does not describe all "
-                        "the variables seen in this instance. "
-                        "Specifically, there is no definition for "
-                        "%(path)s." % {
-                            "id_string" : self.id_string,
-                            "path" : path
-                            }
-                        )
-                elif vardict[path][u"type"] in cleaner:
-                    data[path] = cleaner[vardict[path][u"type"]](data[path])
-        
     def __unicode__(self):
         return getattr(self, "id_string", "")
 

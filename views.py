@@ -13,7 +13,7 @@ from django.forms.models import ModelMultipleChoiceField
 from django.template import RequestContext
 
 import itertools
-from . models import XForm, get_or_create_instance
+from . models import XForm, get_or_create_instance, Instance
 
 @require_GET
 def formList(request, group_name):
@@ -22,37 +22,35 @@ def formList(request, group_name):
         else XForm.objects.filter(downloadable=True, groups__name=group_name)
     return render_to_response(
         "formList.xml",
-        {"xforms" : xforms},
+        {"xforms" : xforms, 'root_url': 'http://%s' % request.get_host()},
         mimetype="application/xml"
         )
 
 @require_POST
 @csrf_exempt
-def submission(request):
+def submission(request, group_name):
     # request.FILES is a django.utils.datastructures.MultiValueDict
     # for each key we have a list of values
-    try:
-        xml_file_list = request.FILES.pop("xml_submission_file", [])
-
-        # save this XML file and media files as attachments
-        instance, created = get_or_create_instance(
-            xml_file_list[0],
-            list(itertools.chain(*request.FILES.values()))
-            )
-
-        # ODK needs two things for a form to be considered successful
-        # 1) the status code needs to be 201 (created)
-        # 2) The location header needs to be set to the host it posted to
-        response = HttpResponse("Your ODK submission was successful.")
-        response.status_code = 201
-        response['Location'] = "http://%s/submission" % request.get_host()
-        return response
-    except:
-        # catch any exceptions and print them to the error log
-        # it'd be good to add more info to these error logs
+    xml_file_list = request.FILES.pop("xml_submission_file", [])
+    if len(xml_file_list)!=1:
         return HttpResponseBadRequest(
-            "We need to improve our error messages and logging."
+            "There should be a single XML submission file."
             )
+
+    # save this XML file and media files as attachments
+    media_files = request.FILES.values()
+    instance, created = get_or_create_instance(
+        xml_file_list[0],
+        media_files
+        )
+
+    # ODK needs two things for a form to be considered successful
+    # 1) the status code needs to be 201 (created)
+    # 2) The location header needs to be set to the host it posted to
+    response = HttpResponse("Your ODK submission was successful.")
+    response.status_code = 201
+    response['Location'] = "http://%s/submission" % request.get_host()
+    return response
 
 def download_xform(request, id_string, group_name=None):
     xform = XForm.objects.get(id_string=id_string)
@@ -120,3 +118,7 @@ def toggle_downloadable(request, id_string):
     xform.downloadable = not xform.downloadable
     xform.save()
     return HttpResponseRedirect(reverse("list_xforms"))
+
+def instance(request, pk):
+    instance = Instance.objects.get(pk=pk)
+    return HttpResponse(instance.as_html())

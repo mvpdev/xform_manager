@@ -3,19 +3,20 @@ Testing POSTs to "/submission"
 """
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
+from django.conf import settings
 import os
-from .models import XForm, Instance
-from . import urls
+from xform_manager.models import XForm, Instance
+from xform_manager import urls
+from xform_manager import utils
 import datetime
-import utils
 
-from xform_manager.factory import XFormManagerFactory
+from xform_manager.factory import XFormManagerFactory, _load_registration_survey_object
 
 class TextXFormCreation(TestCase):
 
     def test_xform_creation(self):
         f = open(os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
+                settings.PROJECT_ROOT, "xform_manager",
                 "fixtures", "test_forms", "registration", "forms",
                 "test_registration.xml"
                 ))
@@ -47,7 +48,7 @@ class TextFactoryXFormCreation(TestCase):
     
     def test_factory_creation_of_registration_instance(self):
         self.assertEqual(0, Instance.objects.count())
-        xi = self.xform_factory.create_registration_instance()
+        xi = self.xform_factory.create_registration_instance({'name':'Joe'})
         self.assertEqual(1, Instance.objects.count())
     
     def test_factory_creation_of_simple_instance(self):
@@ -56,6 +57,10 @@ class TextFactoryXFormCreation(TestCase):
         self.assertEqual(1, Instance.objects.count())
 
 class TestFormSubmission(TestCase):
+    def setUp(self):
+        self.xform_factory = XFormManagerFactory()
+        self.registration_form = self.xform_factory.create_registration_xform()
+    
     def tests_formlist(self):
         response = self.client.get(reverse(urls.FORM_LIST))
         self.assertEqual(response.status_code, 200)
@@ -71,15 +76,26 @@ class TestFormSubmission(TestCase):
         """
         xml_submission_file is the field name for the posted xml file.
         """
+        pz = _load_registration_survey_object().instantiate()
+        pz.answer('start', '2011-01-01T09:50:06.966')
+        pz.answer('end', '2011-01-01T09:53:22.965')
+        pz.answer('device_id', '98765')
+        pz.answer('name', 'Stewie')
+        
+        tfile_path = "registration.xml"
+        tfile_w = open(tfile_path, 'w')
+        tfile_w.write(pz.to_xml())
+        tfile_w.close()
+        
+        tfile = open(tfile_path, 'r')
         post_data = {
-            "xml_submission_file" : (
-                "filename.xml",
-                #this xml text is not the right way to post a file, so should be replaced.
-                "<?xml version='1.0' ?><Example id='Simple Photo Survey'><Location><Picture>1286990143958.jpg</Picture></Location></Example>",
-            )
+            "xml_submission_file" : tfile,
         }
+        # I wish django testcase made it easier to test file uploads....!
         response = self.client.post("/submission", post_data)
-        # self.assertEqual(response.status_code, 200)
+        tfile.close()
+        
+        self.assertEqual(response.status_code, 201)
 
     def test_parse_xform_instance(self):
         xml_str = """<?xml version='1.0' ?><test id="test_id"><a>1</a><b>2</b></test>"""
