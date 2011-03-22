@@ -48,7 +48,7 @@ class TextFactoryXFormCreation(TestCase):
     
     def test_factory_creation_of_registration_instance(self):
         self.assertEqual(0, Instance.objects.count())
-        xi = self.xform_factory.create_registration_instance()
+        xi = self.xform_factory.create_registration_instance({'name':'Joe'})
         self.assertEqual(1, Instance.objects.count())
     
     def test_factory_creation_of_simple_instance(self):
