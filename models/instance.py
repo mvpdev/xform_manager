@@ -44,6 +44,11 @@ class Instance(models.Model):
         # start_date = doc.get(tag.DATE_TIME_START, None)
         # if start_date: self.date = start_date.date()
 
+    def reparse(self):
+        if self.parsed_instance:
+            self.parsed_instance.delete()
+        self.save()
+
     def save(self, *args, **kwargs):
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
