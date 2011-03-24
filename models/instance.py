@@ -5,6 +5,8 @@ from .xform import XForm
 from .survey_type import SurveyType
 from .. import utils, tag
 
+from datetime import datetime
+
 def log(*args, **kwargs):
     """
     This is a place holder for a real logging function.
@@ -20,6 +22,11 @@ class Instance(models.Model):
     start_time = models.DateTimeField(null=True)
     date = models.DateField(null=True)
     survey_type = models.ForeignKey(SurveyType)
+    
+    #shows when we first received this instance
+    date_created = models.DateTimeField()
+    #this will end up representing "date last parsed"
+    date_modified = models.DateTimeField()
 
     class Meta:
         app_label = 'xform_manager'
@@ -50,6 +57,10 @@ class Instance(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
+#        if self.date_created == None:
+#            self.date_created = datetime.now()
+#        self.date_modified = datetime.now()
+        
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
         self._set_start_time(doc)
