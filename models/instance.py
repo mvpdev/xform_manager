@@ -57,9 +57,9 @@ class Instance(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-#        if self.date_created == None:
-#            self.date_created = datetime.now()
-#        self.date_modified = datetime.now()
+        if self.date_created == None:
+            self.date_created = datetime.now()
+        self.date_modified = datetime.now()
         
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
