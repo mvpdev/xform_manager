@@ -27,9 +27,9 @@ class XForm(models.Model):
         )
     title = models.CharField(editable=False, max_length=64)
 
-    date_created = models.DateTimeField(null=True)
-    date_modified = models.DateTimeField(null=True)
-
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    
     class Meta:
         app_label = 'xform_manager'
         verbose_name = "XForm"
@@ -60,10 +60,6 @@ class XForm(models.Model):
         self.title = u"" if not matches else matches[0]
 
     def save(self, *args, **kwargs):
-        if self.date_created == None:
-            self.date_created = datetime.now()
-        self.date_modified = datetime.now()
-        
         self._set_id_string()
         if settings.STRICT and not re.search(r"^[\w-]+$", self.id_string):
             raise Exception("In strict mode, the XForm ID must be a valid slug and contain no spaces.")

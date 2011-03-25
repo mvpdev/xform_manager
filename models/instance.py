@@ -24,10 +24,9 @@ class Instance(models.Model):
     survey_type = models.ForeignKey(SurveyType)
     
     #shows when we first received this instance
-    date_created = models.DateTimeField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     #this will end up representing "date last parsed"
-    date_modified = models.DateTimeField(null=True)
-    doc_ = None
+    date_modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         app_label = 'xform_manager'
@@ -52,17 +51,8 @@ class Instance(models.Model):
         # start_date = doc.get(tag.DATE_TIME_START, None)
         # if start_date: self.date = start_date.date()
 
-    def reparse(self):
-#        if self.parsed_instance is not None:
-#            self.parsed_instance.delete()
-        self.save()
-
     def save(self, *args, **kwargs):
-        if self.date_created == None:
-            self.date_created = datetime.now()
-        self.date_modified = datetime.now()
-        
-        doc = self.get_dict() #utils.parse_xform_instance(self.xml)
+        doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
         self._set_start_time(doc)
         self._set_date(doc)
