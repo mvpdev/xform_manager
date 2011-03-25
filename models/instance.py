@@ -67,8 +67,7 @@ class Instance(models.Model):
 
     def get_dict(self):
         """Return a python object representation of this instance's XML."""
-        if self.doc_ is None: self.doc_ = utils.parse_xform_instance(self.xml)
-        return self.doc_
+        return utils.parse_xform_instance(self.xml)
 
     def get_list_of_pairs(self):
         return utils._xmlstr2pyobj(self.xml)
