@@ -24,9 +24,9 @@ class Instance(models.Model):
     survey_type = models.ForeignKey(SurveyType)
     
     #shows when we first received this instance
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True)
     #this will end up representing "date last parsed"
-    date_modified = models.DateTimeField()
+    date_modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         app_label = 'xform_manager'
@@ -57,10 +57,6 @@ class Instance(models.Model):
         self.save()
 
     def save(self, *args, **kwargs):
-        if self.date_created == None:
-            self.date_created = datetime.now()
-        self.date_modified = datetime.now()
-        
         doc = utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
         self._set_start_time(doc)
