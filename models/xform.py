@@ -27,8 +27,8 @@ class XForm(models.Model):
         )
     title = models.CharField(editable=False, max_length=64)
 
-    date_created = models.DateTimeField()
-    date_modified = models.DateTimeField()
+    date_created = models.DateTimeField(null=True)
+    date_modified = models.DateTimeField(null=True)
 
     class Meta:
         app_label = 'xform_manager'

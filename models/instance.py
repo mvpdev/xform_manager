@@ -24,9 +24,10 @@ class Instance(models.Model):
     survey_type = models.ForeignKey(SurveyType)
     
     #shows when we first received this instance
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(null=True)
     #this will end up representing "date last parsed"
-    date_modified = models.DateTimeField()
+    date_modified = models.DateTimeField(null=True)
+    doc_ = None
 
     class Meta:
         app_label = 'xform_manager'
@@ -52,8 +53,8 @@ class Instance(models.Model):
         # if start_date: self.date = start_date.date()
 
     def reparse(self):
-        if self.parsed_instance:
-            self.parsed_instance.delete()
+#        if self.parsed_instance is not None:
+#            self.parsed_instance.delete()
         self.save()
 
     def save(self, *args, **kwargs):
@@ -61,7 +62,7 @@ class Instance(models.Model):
             self.date_created = datetime.now()
         self.date_modified = datetime.now()
         
-        doc = utils.parse_xform_instance(self.xml)
+        doc = self.get_dict() #utils.parse_xform_instance(self.xml)
         self._set_xform(doc)
         self._set_start_time(doc)
         self._set_date(doc)
@@ -70,7 +71,8 @@ class Instance(models.Model):
 
     def get_dict(self):
         """Return a python object representation of this instance's XML."""
-        return utils.parse_xform_instance(self.xml)
+        if self.doc_ is None: self.doc_ = utils.parse_xform_instance(self.xml)
+        return self.doc_
 
     def get_list_of_pairs(self):
         return utils._xmlstr2pyobj(self.xml)
