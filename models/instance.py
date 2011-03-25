@@ -27,6 +27,7 @@ class Instance(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     #this will end up representing "date last parsed"
     date_modified = models.DateTimeField(auto_now=True)
+    doc_ = None
 
     class Meta:
         app_label = 'xform_manager'
