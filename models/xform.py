@@ -73,6 +73,6 @@ class XForm(models.Model):
         return self.surveys.count()
     submission_count.short_description = "Submission Count"
 
-    def date_of_last_submission(self):
+    def time_of_last_submission(self):
         if self.submission_count() > 0:
-            return self.surveys.order_by("-date")[0].date
+            return self.surveys.order_by("-date_created")[0].date_created
