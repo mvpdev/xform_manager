@@ -31,7 +31,10 @@ def formList(request, group_name):
 def submission(request, group_name):
     # request.FILES is a django.utils.datastructures.MultiValueDict
     # for each key we have a list of values
-    xml_file_list = request.FILES.pop("xml_submission_file", [])
+    try:
+        xml_file_list = request.FILES.pop("xml_submission_file", [])
+    except IOError:
+        raise Exception("The connection broke before all files were posted.")
     if len(xml_file_list)!=1:
         return HttpResponseBadRequest(
             "There should be a single XML submission file."
