@@ -24,9 +24,13 @@ class Instance(models.Model):
     survey_type = models.ForeignKey(SurveyType)
     
     #shows when we first received this instance
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True)
     #this will end up representing "date last parsed"
-    date_modified = models.DateTimeField()
+    date_modified = models.DateTimeField(auto_now=True)
+    
+    #this is used internally.
+    #to access this, use get_dict()
+    __doc_cache = None
 
     class Meta:
         app_label = 'xform_manager'
@@ -51,26 +55,19 @@ class Instance(models.Model):
         # start_date = doc.get(tag.DATE_TIME_START, None)
         # if start_date: self.date = start_date.date()
 
-    def reparse(self):
-        if self.parsed_instance:
-            self.parsed_instance.delete()
-        self.save()
-
     def save(self, *args, **kwargs):
-        if self.date_created == None:
-            self.date_created = datetime.now()
-        self.date_modified = datetime.now()
-        
-        doc = utils.parse_xform_instance(self.xml)
+        doc = self.get_dict()
         self._set_xform(doc)
         self._set_start_time(doc)
         self._set_date(doc)
         self._set_survey_type(doc)
         super(Instance, self).save(*args, **kwargs)
 
-    def get_dict(self):
+    def get_dict(self, force_new=False):
         """Return a python object representation of this instance's XML."""
-        return utils.parse_xform_instance(self.xml)
+        if force_new or self.__doc_cache is None:
+            self.__doc_cache = utils.parse_xform_instance(self.xml)
+        return self.__doc_cache
 
     def get_list_of_pairs(self):
         return utils._xmlstr2pyobj(self.xml)
