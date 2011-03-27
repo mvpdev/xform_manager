@@ -33,6 +33,9 @@ from sentry.client.models import client as sentry_client
 def submission(request, group_name):
     # request.FILES is a django.utils.datastructures.MultiValueDict
     # for each key we have a list of values
+    
+    xml_file_list = []
+    
     try:
         xml_file_list = request.FILES.pop("xml_submission_file", [])
     except IOError:
