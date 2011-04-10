@@ -3,7 +3,9 @@ from django.conf import settings
 
 from .xform import XForm
 from .survey_type import SurveyType
-from .. import utils, tag
+from xform_manager.xform_instance_parser import XFormInstanceParser
+
+from common_tags import ID
 
 from datetime import datetime
 
@@ -28,32 +30,35 @@ class Instance(models.Model):
     #this will end up representing "date last parsed"
     date_modified = models.DateTimeField(auto_now=True)
     
-    #this is used internally.
-    #to access this, use get_dict()
-    __doc_cache = None
-
     class Meta:
         app_label = 'xform_manager'
 
     def _set_xform(self, doc):
         try:
-            self.xform = XForm.objects.get(id_string=doc[tag.XFORM_ID_STRING])
+            self.xform = XForm.objects.get(id_string=doc[ID])
         except XForm.DoesNotExist:
             self.xform = None
             log("The corresponding XForm definition is missing",
-                doc[tag.XFORM_ID_STRING])
+                doc[ID])
+
+    def get_root_node_name(self):
+        self._set_parser()
+        return self._parser.get_root_node_name()
+
+    def get(self, abbreviated_xpath):
+        self._set_parser()
+        return self._parser.get(abbreviated_xpath)
 
     def _set_survey_type(self, doc):
         self.survey_type, created = \
-            SurveyType.objects.get_or_create(slug=doc[tag.INSTANCE_DOC_NAME])
+            SurveyType.objects.get_or_create(slug=self.get_root_node_name())
 
+    # todo: get rid of these fields
     def _set_start_time(self, doc):
-        self.start_time = None # doc.get(tag.DATE_TIME_START, None)
+        self.start_time = None
 
     def _set_date(self, doc):
         self.date = None
-        # start_date = doc.get(tag.DATE_TIME_START, None)
-        # if start_date: self.date = start_date.date()
 
     def save(self, *args, **kwargs):
         doc = self.get_dict()
@@ -63,25 +68,11 @@ class Instance(models.Model):
         self._set_survey_type(doc)
         super(Instance, self).save(*args, **kwargs)
 
+    def _set_parser(self):
+        if not hasattr(self, "_parser"):
+            self._parser = XFormInstanceParser(self.xml)
+
     def get_dict(self, force_new=False):
         """Return a python object representation of this instance's XML."""
-        if force_new or self.__doc_cache is None:
-            self.__doc_cache = utils.parse_xform_instance(self.xml)
-        return self.__doc_cache
-
-    def get_list_of_pairs(self):
-        return utils._xmlstr2pyobj(self.xml)
-
-    def as_html(self):
-        def pair2html(pair, level):
-            if type(pair[1])==list:
-                # note we should deal with levels of headers here
-                result = "<h%(level)s>%(key)s</h%(level)s>" % \
-                    {"level" : level, "key" : pair[0]}
-                for value in pair[1]:
-                    result += pair2html(value, level+1)
-                return result
-            else:
-                return "%(key)s : %(value)s<br/>" % \
-                    {"key" : pair[0], "value" : pair[1]}
-        return pair2html(self.get_list_of_pairs(), 1)
+        self._set_parser()
+        return self._parser.get_flat_dict_with_attributes()
