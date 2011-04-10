@@ -1,146 +1,12 @@
-#!/usr/bin/env python
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
-# import ipdb; ipdb.set_trace()
-
-from xml.dom import minidom
-import os, sys
-from . import tag
-
-SLASH = u"/"
 
 class MyError(Exception):
     pass
 
-def parse_xform_instance(xml_str):
-    """
-    'xml_str' is a str object holding the XML of an XForm
-    instance. Return a python object representation of this XML file.
-    """
-    xml_obj = minidom.parseString(xml_str)
-    root_node = xml_obj.documentElement
-    pyobj = _node2pyobj(root_node)
 
-    # go through the xml object creating a corresponding python
-    # object. note: we're immediately flattening out the document,
-    # this is primarily because we haven't upgraded to Python 2.7, I'm
-    # thinking OrderedDict could come in very handy here.
-    xpath_counts = {}
-    xpath_value_pairs = list(
-        _xpath_value_pairs(pyobj, xpath_counts, [])
-        )
-    survey_data = {}
-    for annotated_xpath, value in xpath_value_pairs:
-        xpath_str = _xpath_str(annotated_xpath, xpath_counts)
-        survey_data[xpath_str] = value
-
-    assert len(list(_all_attributes(root_node)))==1, \
-        u"There should be exactly one attribute in this document."
-    survey_data.update({
-            tag.XFORM_ID_STRING : root_node.getAttribute(u"id"),
-            tag.INSTANCE_DOC_NAME : root_node.nodeName,
-            })
-    return survey_data
-
-def _xpath_str(xpath_with_counts, xpath_counts):
-    """
-    Note: This must be called with the final xpath_counts. Go through
-    an xpath with count annotations and return a string representation
-    of this xpath. Something like 'a/b[0]/c'.
-    """
-    path = []
-    for i in range(len(xpath_with_counts)):
-        xpath_tuple = tuple([pair[0] for pair in xpath_with_counts[:i+1]])
-        path.append(xpath_with_counts[i][0])
-        if xpath_counts[xpath_tuple]>0:
-            path[-1] += "[%s]" % xpath_with_counts[i][1]
-    return SLASH.join(path[1:])
-
-def _add_counts(xpath, xpath_counts):
-    """
-    Annotates an xpath with the current counts in xpath_counts.
-    """
-    return [(xpath[i], xpath_counts[tuple(xpath[:i+1])]) for i in range(len(xpath))]
-
-def _update_xpath_counts(xpath, xpath_counts):
-    """
-    Add this xpath to the dictionary of xpath counts.
-    """
-    xpath_tuple = tuple(xpath)
-    if xpath_tuple in xpath_counts: xpath_counts[xpath_tuple] += 1
-    else: xpath_counts[xpath_tuple] = 0
-
-def _xmlstr2pyobj(xml_str):
-    xml_obj = minidom.parseString(xml_str)
-    root_node = xml_obj.documentElement
-    return _node2pyobj(root_node)
-
-def _node2pyobj(node):
-    """
-    Return a Python object that represents the same data as this XML
-    node.
-    """
-    if len(node.childNodes)==0:
-        # there's no data for this leaf node
-        return node.nodeName, None
-    elif len(node.childNodes)==1 and node.childNodes[0].nodeType==node.TEXT_NODE:
-        # there is data for this leaf node
-        return node.nodeName, node.childNodes[0].nodeValue
-    else:
-        # this is an internal node
-        return node.nodeName, [_node2pyobj(child) for child in node.childNodes]
-
-def _construct_xpath_counts(pair, xpath_counts, xpath_so_far):
-    """
-    Add this xpath to the dictionary of xpath counts.
-    """
-    name, value = pair
-    xpath = xpath_so_far + [name]
-    xpath_tuple = tuple(xpath)
-    if xpath_tuple in xpath_counts: xpath_counts[xpath_tuple] += 1
-    else: xpath_counts[xpath_tuple] = 1
-    if type(value)==list:
-        for child in value:
-            _construct_xpath_counts(child, xpath_counts, xpath)
-
-def _count_xpaths(pair):
-    result = {}
-    _construct_xpath_counts(pair, result, [])
-    return result
-
-def _xpath_value_pairs(pair, xpath_counts, xpath_so_far):
-    name, value = pair
-    xpath = xpath_so_far + [name]
-    _update_xpath_counts(xpath, xpath_counts)
-    xpath_with_counts = _add_counts(xpath, xpath_counts)
-
-    if type(value)!=list:
-        yield xpath_with_counts, value
-    else:
-        for child in value:
-            for xpath_value in _xpath_value_pairs(child, xpath_counts, xpath):
-                yield xpath_value
-
-def _all_attributes(node):
-    """
-    Go through an XML document returning all the attributes we see.
-    """
-    if hasattr(node, "hasAttributes") and node.hasAttributes():
-        for key in node.attributes.keys():
-            yield key, node.getAttribute(key)
-    for child in node.childNodes:
-        for pair in _all_attributes(child):
-            yield pair
-
-
-# f = open(sys.argv[1])
-# xform = XFormParser(f.read())
-# f.close()
-# import json ; print json.dumps(xform.get_variable_dictionary(), indent=4)
-
-
+import traceback
 from django.conf import settings
 from django.core.mail import mail_admins
-import traceback
 def report_exception(subject, info, exc_info=None):
     if exc_info:
         cls, err = exc_info[:2]
@@ -152,7 +18,9 @@ def report_exception(subject, info, exc_info=None):
         print info
     else:
         mail_admins(subject=subject, message=info)
+
         
+import os
 from django.core.files.uploadedfile import InMemoryUploadedFile
 def django_file(path, field_name, content_type):
     # adapted from here: http://groups.google.com/group/django-users/browse_thread/thread/834f988876ff3c45/
