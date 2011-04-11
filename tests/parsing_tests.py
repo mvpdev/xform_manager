@@ -3,11 +3,12 @@
 from django.test import TestCase
 from xform_manager.xform_instance_parser import xform_instance_to_dict, \
     xform_instance_to_flat_dict, parse_xform_instance
+from common_tags import XFORM_ID_STRING
 
 XML = u"xml"
 DICT = u"dict"
 FLAT_DICT = u"flat_dict"
-ID = u"id"
+ID = XFORM_ID_STRING
 
 class TestXFormInstanceParser(TestCase):
 
@@ -85,6 +86,6 @@ class TestXFormInstanceParser(TestCase):
         for d in self.inputs_and_outputs:
             self.assertEqual(xform_instance_to_dict(d[XML]), d[DICT])
             self.assertEqual(xform_instance_to_flat_dict(d[XML]), d[FLAT_DICT])
-            flat_dict_with_id = {u"id": d[ID]}
+            flat_dict_with_id = {ID: d[ID]}
             flat_dict_with_id.update(d[FLAT_DICT])
             self.assertEqual(parse_xform_instance(d[XML]), flat_dict_with_id)

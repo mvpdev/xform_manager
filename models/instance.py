@@ -5,7 +5,7 @@ from .xform import XForm
 from .survey_type import SurveyType
 from xform_manager.xform_instance_parser import XFormInstanceParser
 
-from common_tags import ID
+from common_tags import XFORM_ID_STRING
 
 from datetime import datetime
 
@@ -35,11 +35,11 @@ class Instance(models.Model):
 
     def _set_xform(self, doc):
         try:
-            self.xform = XForm.objects.get(id_string=doc[ID])
+            self.xform = XForm.objects.get(id_string=doc[XFORM_ID_STRING])
         except XForm.DoesNotExist:
             self.xform = None
             log("The corresponding XForm definition is missing",
-                doc[ID])
+                doc[XFORM_ID_STRING])
 
     def get_root_node_name(self):
         self._set_parser()

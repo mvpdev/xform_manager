@@ -2,6 +2,7 @@
 
 from xml.dom import minidom
 import re
+from common_tags import XFORM_ID_STRING
 
 def _xml_node_to_dict(node):
     assert isinstance(node, minidom.Node)
@@ -104,12 +105,12 @@ class XFormInstanceParser(object):
             assert key not in self._attributes
             self._attributes[key] = value
 
-    def get_id_string(self):
-        return self._id_string
+    def get_xform_id_string(self):
+        return self._attributes[u"id"]
 
     def get_flat_dict_with_attributes(self):
         result = self.to_flat_dict().copy()
-        result.update(self._attributes)
+        result[XFORM_ID_STRING] = self.get_xform_id_string()
         return result
 
 
