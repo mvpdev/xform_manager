@@ -2,7 +2,6 @@ from .instance import Instance
 from .xform import XForm
 from .attachment import Attachment
 from .survey_type import SurveyType
-from .. import tag, utils
 
 def get_or_create_instance(xml_file, media_files):
     """
