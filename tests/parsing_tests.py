@@ -50,8 +50,8 @@ class TestXFormInstanceParser(TestCase):
                         }
                     },
                 FLAT_DICT: {
-                    u"b[0]": u"1",
-                    u"b[1]": u"2"
+                    u"b[1]": u"1",
+                    u"b[2]": u"2"
                     },
                 ID: u"test_id"
                 },
@@ -73,8 +73,8 @@ class TestXFormInstanceParser(TestCase):
                         }
                     },
                 FLAT_DICT: {
-                    u"a[0]/b": u"1",
-                    u"a[1]/b": u"2"
+                    u"a[1]/b": u"1",
+                    u"a[2]/b": u"2"
                     },
                 ID: u"test_id"
                 },
