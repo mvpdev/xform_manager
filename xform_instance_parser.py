@@ -2,7 +2,8 @@
 
 from xml.dom import minidom
 import re
-from common_tags import XFORM_ID_STRING
+
+XFORM_ID_STRING = u"_xform_id_string"
 
 def _xml_node_to_dict(node):
     assert isinstance(node, minidom.Node)

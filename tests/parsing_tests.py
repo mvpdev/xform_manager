@@ -3,7 +3,7 @@
 from django.test import TestCase
 from xform_manager.xform_instance_parser import xform_instance_to_dict, \
     xform_instance_to_flat_dict, parse_xform_instance
-from common_tags import XFORM_ID_STRING
+from xform_manager.xform_instance_parser import XFORM_ID_STRING
 
 XML = u"xml"
 DICT = u"dict"

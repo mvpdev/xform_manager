@@ -3,9 +3,8 @@ from django.conf import settings
 
 from .xform import XForm
 from .survey_type import SurveyType
-from xform_manager.xform_instance_parser import XFormInstanceParser
-
-from common_tags import XFORM_ID_STRING
+from xform_manager.xform_instance_parser import XFormInstanceParser, \
+     XFORM_ID_STRING
 
 from datetime import datetime
 
