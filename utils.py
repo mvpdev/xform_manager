@@ -18,18 +18,3 @@ def report_exception(subject, info, exc_info=None):
         print info
     else:
         mail_admins(subject=subject, message=info)
-
-        
-import os
-from django.core.files.uploadedfile import InMemoryUploadedFile
-def django_file(path, field_name, content_type):
-    # adapted from here: http://groups.google.com/group/django-users/browse_thread/thread/834f988876ff3c45/
-    f = open(path)
-    return InMemoryUploadedFile(
-        file=f,
-        field_name=field_name,
-        name=f.name,
-        content_type=content_type,
-        size=os.path.getsize(path),
-        charset=None
-        )
