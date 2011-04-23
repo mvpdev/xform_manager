@@ -28,6 +28,12 @@ class Instance(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     #this will end up representing "date last parsed"
     date_modified = models.DateTimeField(auto_now=True)
+
+    # ODK keeps track of three statuses for an instance:
+    # incomplete, submitted, complete
+    # we will add a fourth status: submitted_via_web
+    status = models.CharField(max_length=20,
+                              default=u'submitted_via_web')
     
     class Meta:
         app_label = 'xform_manager'
