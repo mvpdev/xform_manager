@@ -21,3 +21,14 @@ class TestImportingDatabase(TestCase):
         i2 = Instance.objects.count()
         ims2 = images_count()
 #        self.assertEqual(ims + 1, ims2)
+
+
+"""
+b1:
+1 photo survey (completed)
+1 simple survey (not marked complete)
+
+b2:
+1 photo survey (duplicate, completed)
+1 simple survey (marked as complete)
+"""
