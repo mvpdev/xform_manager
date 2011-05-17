@@ -1,7 +1,10 @@
+# vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
+
 from .instance import Instance
 from .xform import XForm
 from .attachment import Attachment
 from .survey_type import SurveyType
+
 
 def get_or_create_instance(xml_file, media_files, status=u'submitted_via_web'):
     """
@@ -18,6 +21,9 @@ def get_or_create_instance(xml_file, media_files, status=u'submitted_via_web'):
     if created:
         instance.status = status
         instance.save()
-    for f in media_files:
-        Attachment.objects.get_or_create(instance=instance, media_file=f)
+    if instance.attachments.count() != len(media_files):
+        qs = instance.attachments.all()
+        qs.delete()
+        for f in media_files:
+            Attachment.objects.create(instance=instance, media_file=f)
     return instance, created
