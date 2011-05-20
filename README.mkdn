@@ -1,4 +1,4 @@
-XForm Manager v0.2
+XForm Manager v0.3
 ==================
 
 Still in development
