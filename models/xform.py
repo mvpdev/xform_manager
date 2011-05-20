@@ -2,7 +2,6 @@
 # vim: ai ts=4 sts=4 et sw=4 encoding=utf-8
 
 from django.db import models
-from .. import utils, tag
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
@@ -35,6 +34,9 @@ class XForm(models.Model):
         verbose_name = "XForm"
         verbose_name_plural = "XForms"
         ordering = ("id_string",)
+        permissions = (
+            ("can_view", "Can view associated data"),
+            )
 
     def file_name(self):
         return self.id_string + ".xml"

@@ -26,7 +26,22 @@ def formList(request, group_name):
         mimetype="application/xml"
         )
 
-from sentry.client.models import client as sentry_client
+
+try:
+    from sentry.client.models import client as sentry_client
+except:
+    # I want to set this code up to not rely on sentry as it breaks
+    # testing.
+    sentry_client = None
+import logging
+
+def log_error(message, level=logging.ERROR):
+    if sentry_client is not None:
+        sentry_client.create_from_text(message, level=level)
+    else:
+        print "If sentry was set up we would log the following", \
+              message
+
 
 @require_POST
 @csrf_exempt
@@ -40,7 +55,7 @@ def submission(request, group_name):
         xml_file_list = request.FILES.pop("xml_submission_file", [])
     except IOError:
 #        raise Exception("The connection broke before all files were posted.")
-        sentry_client.create_from_text('The connection broke before all files were posted.')
+        log_error('The connection broke before all files were posted.')
     if len(xml_file_list)!=1:
         return HttpResponseBadRequest(
             "There should be a single XML submission file."
