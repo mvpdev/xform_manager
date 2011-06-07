@@ -26,8 +26,6 @@ def formList(request, group_name):
         mimetype="application/xml"
         )
 
-from sentry.client.models import client as sentry_client
-
 @require_POST
 @csrf_exempt
 def submission(request, group_name):
@@ -39,8 +37,8 @@ def submission(request, group_name):
     try:
         xml_file_list = request.FILES.pop("xml_submission_file", [])
     except IOError:
-#        raise Exception("The connection broke before all files were posted.")
-        sentry_client.create_from_text('The connection broke before all files were posted.')
+        raise Exception("The connection broke before all files were posted.")
+#        sentry_client.create_from_text('The connection broke before all files were posted.')
     if len(xml_file_list)!=1:
         return HttpResponseBadRequest(
             "There should be a single XML submission file."
