@@ -26,7 +26,6 @@ def formList(request, group_name):
         mimetype="application/xml"
         )
 
-
 try:
     from sentry.client.models import client as sentry_client
 except:
@@ -41,7 +40,6 @@ def log_error(message, level=logging.ERROR):
     else:
         print "If sentry was set up we would log the following", \
               message
-
 
 @require_POST
 @csrf_exempt
